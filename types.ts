@@ -57,3 +57,11 @@ export interface EmojiItem {
   price: number;
   char: string;
 }
+
+export interface AIOpponent {
+    id: string;
+    name: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+    level: number;
+    avatarUrl: string;
+}

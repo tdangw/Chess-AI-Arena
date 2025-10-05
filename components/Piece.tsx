@@ -36,8 +36,8 @@ const Piece: React.FC<PieceProps> = ({ piece, isSelected, isLastMove, onPieceCli
   const pieceChar = PIECE_UNICODE[piece.player][piece.type];
   const isRed = piece.player === Player.Red;
 
-  const baseClasses = `absolute w-12 h-12 md:w-14 md:h-14 flex items-center justify-center 
-                       font-bold text-2xl md:text-3xl transform -translate-x-1/2 -translate-y-1/2
+  const baseClasses = `absolute w-11 h-11 md:w-12 md:h-12 flex items-center justify-center 
+                       font-bold text-xl md:text-2xl transform -translate-x-1/2 -translate-y-1/2
                        transition-all duration-300 ease-in-out rounded-full`;
   
   const cursorClass = isDraggable ? 'cursor-grab' : 'cursor-pointer';

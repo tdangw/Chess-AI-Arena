@@ -10,6 +10,7 @@ interface BoardProps {
   validMoves: Position[];
   lastMove: Move | null;
   hintMove: Move | null;
+  aiThinkingMove: Move | null;
   onSquareClick: (pos: Position) => void;
   onPieceDragStart: (piece: PieceType) => void;
   equippedSkin: string;
@@ -83,15 +84,16 @@ const PositionMarker: React.FC<PositionMarkerProps> = ({ pos, color }) => {
 };
 
 
-const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMove, hintMove, onSquareClick, onPieceDragStart, equippedSkin, equippedTheme, currentPlayer }) => {
+const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMove, hintMove, aiThinkingMove, onSquareClick, onPieceDragStart, equippedSkin, equippedTheme, currentPlayer }) => {
     const isSummerTheme = equippedTheme === 'summer';
     const boardClasses = `relative w-full aspect-[8/9] border-4 shadow-2xl mx-auto ${isSummerTheme ? 'bg-amber-200 border-sky-700' : 'bg-[#F3D39C] border-[#B58863]'}`;
     const lineColor = isSummerTheme ? 'bg-sky-800/30' : 'bg-black/30';
-    const riverTextClasses = `absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-center items-center text-xl md:text-2xl font-serif select-none pointer-events-none font-black tracking-widest ${isSummerTheme ? 'text-sky-600/60' : 'text-[#B58863]/60'}`;
+    const riverTextClasses = `absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-center items-center text-sm md:text-base font-serif select-none pointer-events-none font-bold tracking-widest ${isSummerTheme ? 'text-sky-600/60' : 'text-[#B58863]/60'}`;
     const MARKER_POSITIONS = [
         {x: 1, y: 2}, {x: 7, y: 2}, {x: 0, y: 3}, {x: 2, y: 3}, {x: 4, y: 3}, {x: 6, y: 3}, {x: 8, y: 3},
         {x: 1, y: 7}, {x: 7, y: 7}, {x: 0, y: 6}, {x: 2, y: 6}, {x: 4, y: 6}, {x: 6, y: 6}, {x: 8, y: 6}
     ];
+    const ringOffsetColor = isSummerTheme ? 'ring-offset-amber-200' : 'ring-offset-[#F3D39C]';
 
     const renderGridLines = () => {
         const lines = [];
@@ -157,6 +159,14 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
                 .animate-red-glow-pulse {
                     animation: red-glow-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
                 }
+                @keyframes thinking-pulse {
+                    50% {
+                        background-color: rgba(236, 72, 153, 0.5);
+                    }
+                }
+                .animate-thinking-pulse {
+                    animation: thinking-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                }
             `}</style>
             {isSummerTheme && (
                 <div className="absolute inset-0 overflow-hidden rounded-md pointer-events-none">
@@ -172,9 +182,9 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
             {MARKER_POSITIONS.map((pos, i) => <PositionMarker key={`marker-${i}`} pos={pos} color={lineColor} />)}
 
             <div className={riverTextClasses}>
-                <div className="relative">
+                 <div className="flex items-baseline justify-center space-x-2 whitespace-nowrap">
                     <span>CỜ TƯỚNG AI ARENA</span>
-                    <span className="absolute left-full top-1/2 -translate-y-1/2 ml-4 text-xs font-sans font-normal tracking-normal opacity-50 whitespace-nowrap">by tdangw</span>
+                    <span className="text-xs font-sans font-normal tracking-normal opacity-70">by tdangw</span>
                 </div>
             </div>
           
@@ -200,7 +210,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
                      return (
                         <div
                             key={`capture-${i}`}
-                            className="absolute w-14 h-14 md:w-16 md:h-16 border-4 border-red-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-red-glow-pulse"
+                            className="absolute w-12 h-12 md:w-14 md:h-14 border-4 border-red-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-red-glow-pulse"
                             style={{
                                 ...style,
                                 boxShadow: '0 0 15px rgba(239, 68, 68, 0.7)',
@@ -220,16 +230,33 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
 
             {hintMove && (
                 <>
-                    <div className="absolute w-14 h-14 md:w-16 md:h-16 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-yellow-400 ring-offset-4 ring-offset-[#F3D39C] animate-pulse"
+                    <div className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 ring-offset-4 ${ringOffsetColor} animate-pulse`}
                         style={{
                             left: `calc(${(hintMove.from.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(hintMove.from.y / (BOARD_HEIGHT - 1)) * 100}%)`,
                         }}
                     />
-                    <div className="absolute w-14 h-14 md:w-16 md:h-16 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-yellow-400 animate-pulse"
+                    <div className="absolute w-12 h-12 md:w-14 md:h-14 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 animate-pulse"
                         style={{
                             left: `calc(${(hintMove.to.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(hintMove.to.y / (BOARD_HEIGHT - 1)) * 100}%)`,
+                        }}
+                    />
+                </>
+            )}
+
+            {aiThinkingMove && (
+                 <>
+                    <div className="absolute w-11 h-11 md:w-12 md:h-12 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
+                        style={{
+                            left: `calc(${(aiThinkingMove.from.x / (BOARD_WIDTH - 1)) * 100}%)`,
+                            top: `calc(${(aiThinkingMove.from.y / (BOARD_HEIGHT - 1)) * 100}%)`,
+                        }}
+                    />
+                    <div className="absolute w-11 h-11 md:w-12 md:h-12 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
+                        style={{
+                            left: `calc(${(aiThinkingMove.to.x / (BOARD_WIDTH - 1)) * 100}%)`,
+                            top: `calc(${(aiThinkingMove.to.y / (BOARD_HEIGHT - 1)) * 100}%)`,
                         }}
                     />
                 </>

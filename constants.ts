@@ -1,4 +1,4 @@
-import { Player, PieceType, Piece, Skin, Avatar, Theme, EmojiItem } from './types';
+import { Player, PieceType, Piece, Skin, Avatar, Theme, EmojiItem, AIOpponent } from './types';
 
 let idCounter = 0;
 
@@ -112,4 +112,28 @@ export const EMOJI_ITEMS: EmojiItem[] = [
     { id: 'e18', name: 'Sweat', price: 50, char: '😅' },
     { id: 'e19', name: 'Vomit', price: 50, char: '🤮' },
     { id: 'e20', name: 'Flex', price: 100, char: '💪' },
+];
+
+export const AI_OPPONENTS: AIOpponent[] = [
+    {
+        id: 'meow',
+        name: 'Meow',
+        difficulty: 'easy',
+        level: 1,
+        avatarUrl: 'https://i.pravatar.cc/150?u=ai_meow'
+    },
+    {
+        id: 'nova',
+        name: 'Nova',
+        difficulty: 'medium',
+        level: 3,
+        avatarUrl: 'https://i.pravatar.cc/150?u=ai_nova'
+    },
+    {
+        id: 'kael',
+        name: 'Kael',
+        difficulty: 'hard',
+        level: 5,
+        avatarUrl: 'https://i.pravatar.cc/150?u=ai_kael'
+    }
 ];

@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Player } from '../types';
+import { Player, AIOpponent } from '../types';
 import { SettingsIcon, UndoIcon, EmojiIcon, HintIcon, ResignIcon } from './icons';
 import { TURN_DURATION_SECONDS } from '../constants';
 import EmojiPicker from './EmojiPicker';
@@ -21,11 +20,12 @@ interface GameHeaderProps {
     ownedEmojis: string[];
     onHint: () => void;
     onResign: () => void;
+    opponent: AIOpponent | null;
 }
 
 const GameHeader: React.FC<GameHeaderProps> = ({ 
     playerName, playerAvatarUrl, currentPlayer, winner, gameTimer, turnTimer, turnDuration,
-    wins, losses, onUndo, onOpenSettings, onSelectEmoji, ownedEmojis, onHint, onResign 
+    wins, losses, onUndo, onOpenSettings, onSelectEmoji, ownedEmojis, onHint, onResign, opponent
 }) => {
     const [isPickerVisible, setIsPickerVisible] = useState(false);
     
@@ -51,8 +51,12 @@ const GameHeader: React.FC<GameHeaderProps> = ({
     const playerGlow = currentPlayer === Player.Red && !winner ? 'shadow-[0_0_15px_3px_#38bdf8] animate-pulse' : '';
     const aiGlow = currentPlayer === Player.Black && !winner ? 'shadow-[0_0_15px_3px_#f472b6] animate-pulse' : '';
 
+    const opponentName = opponent?.name || 'Meow';
+    const opponentLevel = opponent?.level || 1;
+    const opponentAvatarUrl = opponent?.avatarUrl || 'https://i.pravatar.cc/150?u=ai_meow';
+
     return (
-        <div className="w-full max-w-lg lg:max-w-xl text-white font-sans z-20">
+        <div className="w-full max-w-sm md:max-w-md text-white font-sans z-20">
             <div className="relative flex justify-center items-center mb-2 sm:mb-4 space-x-2 sm:space-x-4 md:space-x-6">
                 <button onClick={onOpenSettings} className="text-gray-400 hover:text-white" title="Settings"><SettingsIcon /></button>
                 <button onClick={onUndo} className="text-gray-400 hover:text-white" title="Undo"><UndoIcon /></button>
@@ -83,10 +87,10 @@ const GameHeader: React.FC<GameHeaderProps> = ({
                     {/* Player 2 Info */}
                     <div className="flex items-center space-x-2 z-10">
                          <div>
-                            <p className="font-bold text-[11px] sm:text-xs text-right">Meow</p>
-                            <p className="text-[10px] sm:text-[11px] text-gray-400 text-right">Lv. 1 AI</p>
+                            <p className="font-bold text-[11px] sm:text-xs text-right">{opponentName}</p>
+                            <p className="text-[10px] sm:text-[11px] text-gray-400 text-right">Lv. {opponentLevel} AI</p>
                         </div>
-                        <img src="https://i.pravatar.cc/150?u=ai_meow" alt="Player 2" className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-pink-400 transition-all duration-300 ${aiGlow}`} />
+                        <img src={opponentAvatarUrl} alt="Player 2" className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-pink-400 transition-all duration-300 ${aiGlow}`} />
                     </div>
                 </div>
                  {/* Progress Bar */}

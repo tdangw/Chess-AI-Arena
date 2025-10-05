@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Player, Piece, Position, Move, Skin, Avatar, Theme, EmojiItem, PieceType } from './types';
+import { Player, Piece, Position, Move, Skin, Avatar, Theme, EmojiItem, PieceType, AIOpponent } from './types';
 import Board from './components/Board';
 import Menu from './components/Menu';
 import Shop from './components/Shop';
@@ -9,11 +9,13 @@ import GameHeader from './components/GameHeader';
 import EndGameModal from './components/EndGameModal';
 import SettingsModal from './components/SettingsModal';
 import PieceComponent from './components/Piece';
-import { INITIAL_PIECES, TURN_DURATION_SECONDS, AVATAR_ITEMS, EMOJI_ITEMS, DEFAULT_GAME_TIME_SECONDS } from './constants';
+import { INITIAL_PIECES, PIECE_UNICODE, TURN_DURATION_SECONDS, AVATAR_ITEMS, EMOJI_ITEMS, DEFAULT_GAME_TIME_SECONDS, AI_OPPONENTS } from './constants';
 import { getValidMoves, isCheckmate, isCheck } from './services/gameLogic';
 import { getLocalAIMove } from './services/localAi';
+import { audioService } from './services/audioService';
 
 type GameView = 'menu' | 'game' | 'shop' | 'inventory';
+type AIDifficulty = 'easy' | 'medium' | 'hard';
 
 // --- First Move Animation Component ---
 
@@ -89,14 +91,17 @@ const App: React.FC = () => {
     const [winner, setWinner] = useState<Player | null>(null);
     const [moveHistory, setMoveHistory] = useState<Piece[][]>([JSON.parse(JSON.stringify(INITIAL_PIECES))]);
     const [hintMove, setHintMove] = useState<Move | null>(null);
+    const [aiThinkingMove, setAiThinkingMove] = useState<Move | null>(null);
+    const [aiDifficulty, setAiDifficulty] = useState<AIDifficulty>('easy');
+    const [currentOpponent, setCurrentOpponent] = useState<AIOpponent | null>(AI_OPPONENTS[0]);
 
     // Player Stats & Customization
     const [playerName, setPlayerName] = useState('Player_5566');
-    const [playerXP, setPlayerXP] = useState(50);
-    const [playerCoins, setPlayerCoins] = useState(9950);
+    const [playerXP, setPlayerXP] = useState(55);
+    const [playerCoins, setPlayerCoins] = useState(9960);
     const [wins, setWins] = useState(0);
-    const [losses, setLosses] = useState(10);
-    const [ownedSkins, setOwnedSkins] = useState<string[]>(['default']);
+    const [losses, setLosses] = useState(11);
+    const [ownedSkins, setOwnedSkins] = useState<string[]>(['default', 'inkwash']);
     const [equippedSkin, setEquippedSkin] = useState<string>('default');
     const [ownedAvatars, setOwnedAvatars] = useState<string[]>(['player1']);
     const [equippedAvatar, setEquippedAvatar] = useState<string>('player1');
@@ -123,14 +128,32 @@ const App: React.FC = () => {
     const [musicEnabled, setMusicEnabled] = useState(true);
     const [musicTrack, setMusicTrack] = useState('Celestial');
 
+    // Audio Effects
+    useEffect(() => {
+        audioService.setSoundEnabled(soundEnabled);
+    }, [soundEnabled]);
+
+    useEffect(() => {
+        const shouldPlayMusic = musicEnabled && (view === 'menu' || view === 'game');
+        audioService.setMusicEnabled(shouldPlayMusic);
+    }, [musicEnabled, view]);
+
+
     // Navigation
-    const startGame = () => {
-        handleReset();
+    const startGame = (difficulty: AIDifficulty) => {
+        audioService.playClickSound();
+        const opponent = AI_OPPONENTS.find(o => o.difficulty === difficulty);
+        if (opponent) {
+            setCurrentOpponent(opponent);
+        }
+        setAiDifficulty(difficulty);
+        handleReset(false); // Don't play click sound again
         setView('game');
         setShowFirstMoveAnimation(true);
     };
 
     const handleNavigate = (newView: GameView) => {
+        audioService.playClickSound();
         if (view === 'game' || view === 'menu') {
             setPreviousView(view);
         }
@@ -138,6 +161,7 @@ const App: React.FC = () => {
     };
     
     const handleBack = () => {
+        audioService.playClickSound();
         if (previousView) {
             setView(previousView);
             setPreviousView(null);
@@ -173,6 +197,12 @@ const App: React.FC = () => {
         setShowEndGameAnimation(gameWinner === Player.Red ? 'win' : 'lose');
         
         const isWin = gameWinner === Player.Red;
+        if (isWin) {
+            audioService.playWinSound();
+        } else {
+            audioService.playLoseSound();
+        }
+
         const xpGained = isWin ? 20 : 5;
         const coinsGained = isWin ? 25 : 10;
 
@@ -203,7 +233,8 @@ const App: React.FC = () => {
         }
     }, [turnTimer, gameTimer, currentPlayer, gameState, endGame]);
 
-    const handleReset = useCallback(() => {
+    const handleReset = useCallback((playSound = true) => {
+        if (playSound) audioService.playClickSound();
         const initialPiecesState = JSON.parse(JSON.stringify(INITIAL_PIECES));
         setPieces(initialPiecesState);
         setCurrentPlayer(Player.Red); // Default starter, will be overwritten by animation
@@ -216,6 +247,7 @@ const App: React.FC = () => {
         setShowEndGameAnimation(null);
         setShowCheckWarning(false);
         setHintMove(null);
+        setAiThinkingMove(null);
         setMoveHistory([initialPiecesState]);
         setGameTimer(gameDuration);
         setTurnTimer(turnDuration);
@@ -244,6 +276,13 @@ const App: React.FC = () => {
         const pieceToMove = pieces.find(p => p.position.x === from.x && p.position.y === from.y);
         if (!pieceToMove) return;
 
+        const isCapture = pieces.some(p => p.position.x === to.x && p.position.y === to.y);
+        if (isCapture) {
+            audioService.playCaptureSound();
+        } else {
+            audioService.playMoveSound();
+        }
+
         const newPieces = pieces.filter(p => !(p.position.x === to.x && p.position.y === to.y));
         const movedPieces = newPieces.map(p => 
             p.id === pieceToMove.id ? { ...p, position: to } : p
@@ -261,8 +300,19 @@ const App: React.FC = () => {
     // AI Move Effect
     useEffect(() => {
         if (currentPlayer === Player.Black && (gameState === 'playing' || gameState === 'check') && view === 'game' && !showFirstMoveAnimation) {
-            const performAiMove = () => {
-                const aiResult = getLocalAIMove(pieces, Player.Black, moveHistory);
+            const performAiMove = async () => {
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
+                
+                const aiResult = await getLocalAIMove(
+                    pieces, 
+                    Player.Black, 
+                    moveHistory,
+                    aiDifficulty,
+                    (move) => setAiThinkingMove(move)
+                );
+
+                setAiThinkingMove(null); // Clear indicator
+
                 if (aiResult && aiResult.move) {
                     makeMove(aiResult.move.from, aiResult.move.to);
                     if (aiResult.emoji) {
@@ -275,10 +325,9 @@ const App: React.FC = () => {
                     endGame(Player.Red);
                 }
             };
-            const timer = setTimeout(performAiMove, 500);
-            return () => clearTimeout(timer);
+            performAiMove();
         }
-    }, [currentPlayer, pieces, gameState, makeMove, view, endGame, moveHistory, showFirstMoveAnimation]);
+    }, [currentPlayer, pieces, gameState, makeMove, view, endGame, moveHistory, showFirstMoveAnimation, aiDifficulty]);
 
     const handleSquareClick = (pos: Position) => {
         if (gameState === 'checkmate' || currentPlayer !== Player.Red || showEndGameAnimation || showFirstMoveAnimation) return;
@@ -311,6 +360,7 @@ const App: React.FC = () => {
     };
 
     const handleUndo = () => {
+        audioService.playClickSound();
         if (moveHistory.length < 3 || currentPlayer !== Player.Red || showEndGameAnimation || showFirstMoveAnimation) return;
     
         const stateBeforePlayerMove = moveHistory[moveHistory.length - 3];
@@ -326,9 +376,10 @@ const App: React.FC = () => {
         setTurnTimer(turnDuration);
     };
 
-    const handleHint = () => {
+    const handleHint = async () => {
+        audioService.playClickSound();
         if (currentPlayer !== Player.Red || gameState === 'checkmate' || hintMove) return;
-        const hintResult = getLocalAIMove(pieces, Player.Red, moveHistory);
+        const hintResult = await getLocalAIMove(pieces, Player.Red, moveHistory, 'easy', () => {});
         if (hintResult && hintResult.move) {
             setHintMove(hintResult.move);
             setTimeout(() => setHintMove(null), 3000); // Hint visible for 3 seconds
@@ -337,6 +388,7 @@ const App: React.FC = () => {
 
     // Shop & Inventory Logic
     const handleBuyItem = (item: Skin | Avatar | Theme | EmojiItem, type: 'skin' | 'avatar' | 'theme' | 'emoji') => {
+        audioService.playClickSound();
         if (playerCoins < item.price) return;
         setPlayerCoins(c => c - item.price);
         if (type === 'skin') setOwnedSkins(s => [...s, item.id]);
@@ -345,17 +397,20 @@ const App: React.FC = () => {
         if (type === 'emoji') setOwnedEmojis(e => [...e, item.id]);
     };
     const handleEquipItem = (itemId: string, type: 'skin' | 'avatar' | 'theme') => {
+        audioService.playClickSound();
         if (type === 'skin') setEquippedSkin(itemId);
         if (type === 'avatar') setEquippedAvatar(itemId);
         if (type === 'theme') setEquippedTheme(itemId);
     };
 
     const handleResign = () => {
+        audioService.playClickSound();
         setIsSettingsOpen(false);
         endGame(Player.Black);
     };
     
     const handleSelectEmoji = (emoji: string) => {
+        audioService.playClickSound();
         setAnimatingEmoji({ emoji, from: 'player' });
         setTimeout(() => setAnimatingEmoji(null), 3500);
     }
@@ -366,6 +421,15 @@ const App: React.FC = () => {
     };
 
     const playerAvatarUrl = AVATAR_ITEMS.find(a => a.id === equippedAvatar)?.url || 'https://i.pravatar.cc/150?u=player1';
+
+    const { capturedRedPieces, capturedBlackPieces } = useMemo(() => {
+        const currentPieceIds = new Set(pieces.map(p => p.id));
+        const captured = INITIAL_PIECES.filter(p => !currentPieceIds.has(p.id));
+        return {
+            capturedRedPieces: captured.filter(p => p.player === Player.Red).sort((a,b) => a.id - b.id),
+            capturedBlackPieces: captured.filter(p => p.player === Player.Black).sort((a,b) => a.id - b.id)
+        };
+    }, [pieces]);
 
     const renderView = () => {
         switch(view) {
@@ -451,30 +515,51 @@ const App: React.FC = () => {
                             wins={wins}
                             losses={losses}
                             onUndo={handleUndo}
-                            onOpenSettings={() => setIsSettingsOpen(true)}
+                            onOpenSettings={() => {
+                                audioService.playClickSound();
+                                setIsSettingsOpen(true);
+                            }}
                             onSelectEmoji={handleSelectEmoji}
                             ownedEmojis={ownedEmojis}
                             onHint={handleHint}
                             onResign={handleResign}
+                            opponent={currentOpponent}
                         />
 
-                        <div className="w-full max-w-lg lg:max-w-xl mx-auto mt-4 sm:mt-6">
+                        <div className="w-full max-w-sm md:max-w-md mx-auto mt-5 sm:mt-7">
                             <Board
                                 pieces={pieces}
                                 selectedPiece={selectedPiece}
                                 validMoves={validMoves}
                                 lastMove={lastMove}
                                 hintMove={hintMove}
+                                aiThinkingMove={aiThinkingMove}
                                 onSquareClick={handleSquareClick}
                                 onPieceDragStart={handlePieceDragStart}
                                 equippedSkin={equippedSkin}
                                 equippedTheme={equippedTheme}
                                 currentPlayer={currentPlayer}
                             />
+                             <div className="mt-2 grid grid-cols-2 gap-2 h-20">
+                                <div className="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
+                                    {capturedBlackPieces.map(piece => (
+                                        <div key={piece.id} title={piece.type} className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-gray-700 to-gray-900 border border-black shadow-sm">
+                                            <span className="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
+                                    {capturedRedPieces.map(piece => (
+                                        <div key={piece.id} title={piece.type} className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-red-500 to-red-800 border border-red-900 shadow-sm">
+                                            <span className="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                         
                         {animatingEmoji && (
-                             <div className={`absolute top-0 h-full w-24 z-30 pointer-events-none ${animatingEmoji.from === 'player' ? 'left-[calc(50%-18rem)]' : 'right-[calc(50%-18rem)]'} `}>
+                             <div className={`absolute top-0 h-full w-24 z-30 pointer-events-none ${animatingEmoji.from === 'player' ? 'left-[calc(50%-13rem)]' : 'right-[calc(50%-13rem)]'} `}>
                                 <div className="relative w-full h-full">
                                     <span className="absolute top-[60px] text-7xl animate-fall-and-settle" style={{ textShadow: '0 0 15px rgba(0,0,0,0.5)' }}>
                                         {animatingEmoji.emoji}
@@ -485,14 +570,14 @@ const App: React.FC = () => {
                         
                          {showEndGameAnimation && (
                             <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
-                                <h1 className={`text-7xl md:text-8xl font-extrabold animate-zoom-in-out ${showEndGameAnimation === 'win' ? 'text-green-400' : 'text-red-500'}`}
-                                    style={{ textShadow: '0 0 20px rgba(0,0,0,0.7)' }}>
+                                <h1 className={`text-6xl md:text-7xl font-extrabold animate-zoom-in-out ${showEndGameAnimation === 'win' ? 'text-green-400' : 'text-red-500'}`}
+                                    style={{ textShadow: '0 0 20px rgba(0,0,0,0.7)', transform: 'translateY(-2rem)' }}>
                                     {showEndGameAnimation === 'win' ? 'YOU WIN!' : 'YOU LOSE!'}
                                 </h1>
                             </div>
                         )}
                         {showCheckWarning && (
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-24 md:mt-32 z-30 pointer-events-none">
+                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[150%] z-30 pointer-events-none">
                                 <h2 className="text-4xl md:text-5xl font-bold text-yellow-400 animate-check-warning" style={{ textShadow: '0 0 10px #000' }}>
                                     CHECK!
                                 </h2>
@@ -519,7 +604,10 @@ const App: React.FC = () => {
                     onStartGame={startGame} 
                     onGoToShop={() => handleNavigate('shop')}
                     onGoToInventory={() => handleNavigate('inventory')}
-                    onOpenSettings={() => setIsSettingsOpen(true)}
+                    onOpenSettings={() => {
+                        audioService.playClickSound();
+                        setIsSettingsOpen(true);
+                    }}
                     playerAvatarUrl={playerAvatarUrl}
                     playerXP={playerXP}
                     playerCoins={playerCoins}
@@ -536,16 +624,25 @@ const App: React.FC = () => {
                 <SettingsModal
                     context={view === 'game' ? 'game' : 'menu'}
                     soundEnabled={soundEnabled}
-                    onToggleSound={() => setSoundEnabled(p => !p)}
+                    onToggleSound={() => {
+                        audioService.playClickSound();
+                        setSoundEnabled(p => !p);
+                    }}
                     musicEnabled={musicEnabled}
-                    onToggleMusic={() => setMusicEnabled(p => !p)}
+                    onToggleMusic={() => {
+                        audioService.playClickSound();
+                        setMusicEnabled(p => !p);
+                    }}
                     selectedTrack={musicTrack}
                     onSelectTrack={setMusicTrack}
                     gameDuration={gameDuration}
                     onSetGameDuration={setGameDuration}
                     turnDuration={turnDuration}
                     onSetTurnDuration={setTurnDuration}
-                    onClose={() => setIsSettingsOpen(false)}
+                    onClose={() => {
+                        audioService.playClickSound();
+                        setIsSettingsOpen(false);
+                    }}
                     onResign={handleResign}
                     onGoToShop={() => {
                         setIsSettingsOpen(false);

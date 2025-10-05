@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { CloseIcon } from './icons';
+import { audioService } from '../services/audioService';
 
 interface SettingsModalProps {
     context: 'game' | 'menu';
@@ -50,7 +51,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <select
                     id={id}
                     value={value}
-                    onChange={(e) => onChange(Number(e.target.value))}
+                    onChange={(e) => {
+                        audioService.playClickSound();
+                        onChange(Number(e.target.value));
+                    }}
+                    onClick={() => audioService.playClickSound()}
                     className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                 >
                     {options.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
