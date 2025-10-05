@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "npx gh-pages -d dist",
-    "tw-config": "tailwindcss init -p"
+    "tw-init": "./node_modules/.bin/tailwindcss init -p"
   },
   "dependencies": {
     "react-dom": "^19.2.0",
