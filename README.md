@@ -60,23 +60,38 @@ The `services/audioService.ts` is already configured to look for these files in 
 
 ## How to Deploy to GitHub Pages
 
-This project is configured to be deployed easily to GitHub Pages.
+This project includes an automated script to make deploying to GitHub Pages simple.
 
-### 1. Create a GitHub Repository
+### Prerequisites
 
-If you haven't already, create a new repository on GitHub and push your project files to it.
+You need to have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed on your machine.
 
-### 2. Enable GitHub Pages
+### Deployment Steps
 
-1.  In your repository on GitHub, go to the **Settings** tab.
-2.  In the left sidebar, click on **Pages**.
-3.  Under the "Build and deployment" section, for the **Source**, select **Deploy from a branch**.
-4.  Choose the branch you want to deploy from (usually `main` or `master`).
-5.  Keep the folder as `/ (root)`.
-6.  Click **Save**.
+1.  **Install Dependencies:** Open your terminal in the project's root directory and run this command once to install the necessary deployment tool:
+    ```bash
+    npm install
+    ```
 
-### 3. Access Your Deployed Site
+2.  **Configure `package.json`:** Open the `package.json` file and find the `"homepage"` line. You **must** edit this line to match your GitHub Pages URL. Replace `{USERNAME}` with your GitHub username and `{REPO_NAME}` with your repository name.
+    ```json
+    "homepage": "https://{USERNAME}.github.io/{REPO_NAME}",
+    ```
+    For example, if your username is `tdangw` and your repository is `chess-ai-arena`, it should look like this:
+    ```json
+    "homepage": "https://tdangw.github.io/chess-ai-arena/",
+    ```
 
-After a few minutes, your site will be deployed. GitHub will provide you with the public URL at the top of the Pages settings screen (e.g., `https://<your-username>.github.io/<your-repo-name>/`).
+3.  **Run the Deploy Script:** Once configured, run the following command in your terminal:
+    ```bash
+    npm run deploy
+    ```
+    This command will automatically create a `gh-pages` branch, push all your project files to it, and publish them.
 
-**Important:** The project's `index.html` file uses relative paths (e.g., `./index.tsx`), which allows it to work correctly when hosted in a subdirectory like on GitHub Pages. No further configuration is needed.
+4.  **Set GitHub Pages Source:**
+    *   In your repository on GitHub, go to **Settings** > **Pages**.
+    *   Under "Build and deployment", set the **Source** to **Deploy from a branch**.
+    *   Set the **Branch** to `gh-pages`.
+    *   Click **Save**.
+
+Your application will now be live at the URL you specified in the `homepage` field.
