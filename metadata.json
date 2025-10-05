@@ -1,0 +1,5 @@
+{
+  "name": "Chess AI Arena",
+  "description": "A classic Caro (Five in a row) game where you can play against AI opponents of varying difficulty. Features a sleek, modern interface, player progression with XP and coins, and customizable items from the shop.",
+  "requestFramePermissions": []
+}
