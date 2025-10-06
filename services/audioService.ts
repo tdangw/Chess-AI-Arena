@@ -4,6 +4,8 @@ interface AudioSources {
   capture: HTMLAudioElement | null;
   win: HTMLAudioElement | null;
   lose: HTMLAudioElement | null;
+  winEffect: HTMLAudioElement | null;
+  loseEffect: HTMLAudioElement | null;
   click: HTMLAudioElement | null;
   select: HTMLAudioElement | null;
   firstMovePlayer: HTMLAudioElement | null;
@@ -17,6 +19,8 @@ class AudioService {
     capture: null,
     win: null,
     lose: null,
+    winEffect: null,
+    loseEffect: null,
     click: null,
     select: null,
     firstMovePlayer: null,
@@ -56,6 +60,8 @@ class AudioService {
     this.sources.capture = new Audio('assets/sounds/capture.mp3');
     this.sources.win = new Audio('assets/sounds/announce_win.mp3');
     this.sources.lose = new Audio('assets/sounds/announce_lose.mp3');
+    this.sources.winEffect = new Audio('assets/sounds/win.mp3');
+    this.sources.loseEffect = new Audio('assets/sounds/lose.mp3');
     this.sources.click = new Audio('assets/sounds/click.mp3');
     this.sources.select = new Audio('assets/sounds/select.mp3');
     this.sources.firstMovePlayer = new Audio('assets/sounds/first_move_player.mp3');
@@ -153,8 +159,14 @@ class AudioService {
 
   public playMoveSound = () => this.playSound(this.sources.move);
   public playCaptureSound = () => this.playSound(this.sources.capture);
-  public playWinSound = () => this.playSound(this.sources.win);
-  public playLoseSound = () => this.playSound(this.sources.lose);
+  public playWinSound = () => {
+    this.playSound(this.sources.win);
+    this.playSound(this.sources.winEffect);
+  };
+  public playLoseSound = () => {
+    this.playSound(this.sources.lose);
+    this.playSound(this.sources.loseEffect);
+  };
   public playClickSound = () => this.playSound(this.sources.click);
   public playSelectSound = () => this.playSound(this.sources.select);
   public playFirstMovePlayerSound = () => this.playSound(this.sources.firstMovePlayer);

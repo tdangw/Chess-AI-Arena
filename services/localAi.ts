@@ -132,50 +132,57 @@ const workerCode = `
         return 0;
     };
     
-    const evaluateDoubleCannonThreat = (pieces, player) => {
+    const evaluateCannonThreatOnGeneralFile = (pieces, player) => {
+        // This function evaluates threats from 'player's cannons against the opponent's general.
         const opponent = player === Player.Red ? Player.Black : Player.Red;
         const opponentGeneral = pieces.find(p => p.type === PieceType.General && p.player === opponent);
         if (!opponentGeneral) return 0;
 
-        const piecesOnColumn = pieces
-            .filter(p => p.position.x === opponentGeneral.position.x)
-            .sort((a, b) => a.position.y - b.position.y);
-
-        if (piecesOnColumn.length < 3) return 0;
+        const playerCannons = pieces.filter(p => p.type === PieceType.Cannon && p.player === player);
+        if (playerCannons.length === 0) return 0;
         
-        const generalIndex = piecesOnColumn.findIndex(p => p.id === opponentGeneral.id);
-        if (generalIndex === -1) return 0;
+        let threatScore = 0;
+        const generalFile = opponentGeneral.position.x;
 
-        // Check for the pattern: General, Screen, Cannon
-        if (generalIndex + 2 < piecesOnColumn.length) {
-            const screen = piecesOnColumn[generalIndex + 1];
-            const backCannon = piecesOnColumn[generalIndex + 2];
-            if (backCannon.type === PieceType.Cannon && backCannon.player === player) {
-                const otherCannons = pieces.filter(p => p.type === PieceType.Cannon && p.player === player && p.id !== backCannon.id);
-                for (const frontCannon of otherCannons) {
-                    if (isValidMoveForPiece(pieces, frontCannon, screen.position)) {
-                        return 3000; // Direct checkmate threat
-                    }
-                }
-            }
-        }
+        // Find all cannons from 'player' on the same file as the opponent's general.
+        const cannonsOnGeneralFile = playerCannons.filter(c => c.position.x === generalFile);
 
-        // Check for the pattern in reverse: Cannon, Screen, General
-        if (generalIndex - 2 >= 0) {
-            const screen = piecesOnColumn[generalIndex - 1];
-            const backCannon = piecesOnColumn[generalIndex - 2];
-            if (backCannon.type === PieceType.Cannon && backCannon.player === player) {
-                 const otherCannons = pieces.filter(p => p.type === PieceType.Cannon && p.player === player && p.id !== backCannon.id);
-                for (const frontCannon of otherCannons) {
-                    if (isValidMoveForPiece(pieces, frontCannon, screen.position)) {
-                        return 3000; // Direct checkmate threat
+        if (cannonsOnGeneralFile.length > 0) {
+            for (const cannon of cannonsOnGeneralFile) {
+                const piecesBetween = getPiecesBetween(pieces, cannon.position, opponentGeneral.position);
+                
+                if (piecesBetween.length === 0) {
+                    // Direct threat, creating a pin. Very valuable strategically.
+                    threatScore += 150; 
+                } else if (piecesBetween.length === 1) {
+                    // "Back cannon" setup. The most dangerous cannon formation.
+                    const screenPiece = piecesBetween[0];
+                    threatScore += 400; // High base threat for setting this up.
+
+                    // Check if another cannon can attack the screen piece to deliver checkmate.
+                    const otherCannons = pieces.filter(c => c.type === PieceType.Cannon && c.player === player && c.id !== cannon.id);
+                    for(const frontCannon of otherCannons) {
+                        if(isValidMoveForPiece(pieces, frontCannon, screenPiece.position)) {
+                            // This is a direct double cannon attack setup.
+                            // The penalty must be extremely high to force a defensive move.
+                            threatScore += 8000;
+                        }
                     }
                 }
             }
         }
         
-        return 0;
-    }
+        // Also evaluate cannons that are NOT on the general file but can easily move there.
+        // This encourages proactive positioning.
+        if (generalFile >= 3 && generalFile <= 5) {
+             const centralCannonsThreatening = playerCannons.filter(c => {
+                 return c.position.x !== generalFile && isValidMoveForPiece(pieces, c, { x: generalFile, y: c.position.y });
+             });
+             threatScore += centralCannonsThreatening.length * 50;
+        }
+
+        return threatScore;
+    };
 
     const evaluateBoard = (pieces, player) => {
         let score = 0;
@@ -184,8 +191,8 @@ const workerCode = `
         if (isCheck(pieces, player)) score -= 5000;
         if (isCheck(pieces, opponent)) score += 500;
         
-        score += evaluateDoubleCannonThreat(pieces, player);
-        score -= evaluateDoubleCannonThreat(pieces, opponent);
+        score += evaluateCannonThreatOnGeneralFile(pieces, player);
+        score -= evaluateCannonThreatOnGeneralFile(pieces, opponent);
 
         for (const piece of pieces) {
             const value = PIECE_VALUES[piece.type] + getPositionalValue(piece);
@@ -289,44 +296,47 @@ const workerCode = `
 let aiWorker: Worker | null = null;
 
 export const getLocalAIMove = async (
-    pieces: Piece[], 
-    aiPlayer: Player, 
-    moveHistory: Piece[][],
-    difficulty: 'easy' | 'medium' | 'hard',
-    onProgress: (move: Move) => void
+  pieces: Piece[],
+  aiPlayer: Player,
+  moveHistory: Piece[][],
+  difficulty: 'easy' | 'medium' | 'hard',
+  onProgress: (move: Move) => void
 ): Promise<{ move: Move; emoji?: string } | null> => {
+  if (aiWorker) {
+    aiWorker.terminate();
+  }
 
-    if (aiWorker) {
-        aiWorker.terminate();
+  const workerScript = `const EMOJI_ITEMS = ${JSON.stringify(
+    EMOJI_ITEMS
+  )};\n${workerCode}`;
+  const workerBlob = new Blob([workerScript], {
+    type: 'application/javascript',
+  });
+  aiWorker = new Worker(URL.createObjectURL(workerBlob));
+
+  return new Promise((resolve, reject) => {
+    if (!aiWorker) {
+      reject(new Error('Worker could not be created.'));
+      return;
     }
 
-    const workerScript = `const EMOJI_ITEMS = ${JSON.stringify(EMOJI_ITEMS)};\n${workerCode}`;
-    const workerBlob = new Blob([workerScript], { type: 'application/javascript' });
-    aiWorker = new Worker(URL.createObjectURL(workerBlob));
-    
-    return new Promise((resolve, reject) => {
-        if (!aiWorker) {
-            reject(new Error("Worker could not be created."));
-            return;
-        }
+    aiWorker.onmessage = (e) => {
+      if (e.data.type === 'progress') {
+        onProgress(e.data.move);
+      } else if (e.data.type === 'result') {
+        if (aiWorker) aiWorker.terminate();
+        aiWorker = null;
+        resolve(e.data.data);
+      }
+    };
 
-        aiWorker.onmessage = (e) => {
-            if (e.data.type === 'progress') {
-                onProgress(e.data.move);
-            } else if (e.data.type === 'result') {
-                if (aiWorker) aiWorker.terminate();
-                aiWorker = null;
-                resolve(e.data.data);
-            }
-        };
+    aiWorker.onerror = (e) => {
+      console.error('AI Worker Error:', e);
+      if (aiWorker) aiWorker.terminate();
+      aiWorker = null;
+      reject(e);
+    };
 
-        aiWorker.onerror = (e) => {
-            console.error('AI Worker Error:', e);
-            if (aiWorker) aiWorker.terminate();
-            aiWorker = null;
-            reject(e);
-        };
-
-        aiWorker.postMessage({ pieces, aiPlayer, moveHistory, difficulty });
-    });
+    aiWorker.postMessage({ pieces, aiPlayer, moveHistory, difficulty });
+  });
 };

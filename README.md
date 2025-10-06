@@ -27,8 +27,10 @@ You will need the following audio files, preferably in `.mp3` format for broad b
 - `move.mp3`: Sound for a standard piece move.
 - `capture.mp3`: Sound for capturing an opponent's piece.
 - `select.mp3`: Sound for selecting a piece.
-- `announce_win.mp3`: Sound for winning a game.
-- `announce_lose.mp3`: Sound for losing a game.
+- `win.mp3`: A sound effect for winning (e.g., a chime).
+- `lose.mp3`: A sound effect for losing (e.g., a sad tone).
+- `announce_win.mp3`: A voice-over for winning a game (e.g., "You Win!").
+- `announce_lose.mp3`: A voice-over for losing a game (e.g., "You Lose!").
 - `first_move_player.mp3`: Sound for when the player goes first.
 - `first_move_ai.mp3`: Sound for when the AI goes first.
 - `click.mp3`: A simple UI click sound for buttons.
@@ -51,6 +53,8 @@ The final structure should look like this:
 │   │       ├── move.mp3
 │   │       ├── capture.mp3
 │   │       ├── select.mp3
+│   │       ├── win.mp3
+│   │       ├── lose.mp3
 │   │       ├── announce_win.mp3
 │   │       ├── announce_lose.mp3
 │   │       ├── first_move_player.mp3
