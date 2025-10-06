@@ -31,14 +31,14 @@ class AudioService {
 
   private initializeAudio() {
     if (typeof Audio !== 'undefined') {
-        this.sources.music = new Audio('/assets/music.mp3');
+        this.sources.music = new Audio('./assets/music.mp3');
         this.sources.music.loop = true;
         this.sources.music.volume = 0.5; // Lower volume for background music
-        this.sources.move = new Audio('/assets/move.mp3');
-        this.sources.capture = new Audio('/assets/capture.mp3');
-        this.sources.win = new Audio('/assets/win.mp3');
-        this.sources.lose = new Audio('/assets/lose.mp3');
-        this.sources.click = new Audio('/assets/click.mp3');
+        this.sources.move = new Audio('./assets/move.mp3');
+        this.sources.capture = new Audio('./assets/capture.mp3');
+        this.sources.win = new Audio('./assets/win.mp3');
+        this.sources.lose = new Audio('./assets/lose.mp3');
+        this.sources.click = new Audio('./assets/click.mp3');
         
         // If music was enabled before interaction, start it now.
         if (this.musicEnabled) {

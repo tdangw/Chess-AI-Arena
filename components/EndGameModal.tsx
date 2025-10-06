@@ -59,29 +59,29 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
     const barWidth = (currentLevelXP / MAX_XP_PER_LEVEL) * 100;
 
     return (
-        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans">
-            <div className="bg-[#1E293B] w-full max-w-sm rounded-2xl p-8 text-center text-white border-2 border-gray-700 shadow-lg animate-fade-in-up">
-                <h1 className={`text-6xl font-extrabold mb-4 ${isPlayerWinner ? 'text-green-400' : 'text-red-500'}`}>
+        <div class="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans">
+            <div class="bg-[#1E293B] w-full max-w-sm rounded-2xl p-8 text-center text-white border-2 border-gray-700 shadow-lg animate-fade-in-up">
+                <h1 class={`text-6xl font-extrabold mb-4 ${isPlayerWinner ? 'text-green-400' : 'text-red-500'}`}>
                     {isPlayerWinner ? 'YOU WIN!' : 'YOU LOSE!'}
                 </h1>
 
-                <div className="bg-slate-800/50 p-4 rounded-lg mb-6">
-                    <p className="text-sm text-gray-400">Level {playerLevel}</p>
-                    <div className="w-full bg-gray-900 rounded-full h-4 my-2 border border-gray-700 relative overflow-hidden">
+                <div class="bg-slate-800/50 p-4 rounded-lg mb-6">
+                    <p class="text-sm text-gray-400">Level {playerLevel}</p>
+                    <div class="w-full bg-gray-900 rounded-full h-4 my-2 border border-gray-700 relative overflow-hidden">
                         <div 
-                            className="absolute left-0 top-0 h-full bg-cyan-500 rounded-full"
+                            class="absolute left-0 top-0 h-full bg-cyan-500 rounded-full"
                             style={{ width: `${barWidth}%`, transition: 'width 0.1s linear' }}
                         ></div>
-                        <span className="absolute text-xs font-bold inset-0 flex items-center justify-center text-shadow">
+                        <span class="absolute text-xs font-bold inset-0 flex items-center justify-center text-shadow">
                             {currentLevelXP} / {MAX_XP_PER_LEVEL} XP
                         </span>
                     </div>
-                    <div className="flex justify-center mt-4">
-                        <div className="flex flex-col items-center">
-                            <p className="text-lg font-bold text-yellow-400">REWARDS</p>
-                            <div className="flex items-center mt-1 space-x-4">
-                                <span className="text-2xl font-bold flex items-center"><CoinIcon /> +{coinsGained}</span>
-                                <span className="text-2xl font-bold text-cyan-400">✨ +{xpGained} XP</span>
+                    <div class="flex justify-center mt-4">
+                        <div class="flex flex-col items-center">
+                            <p class="text-lg font-bold text-yellow-400">REWARDS</p>
+                            <div class="flex items-center mt-1 space-x-4">
+                                <span class="text-2xl font-bold flex items-center"><CoinIcon /> +{coinsGained}</span>
+                                <span class="text-2xl font-bold text-cyan-400">✨ +{xpGained} XP</span>
                             </div>
                         </div>
                     </div>
@@ -89,13 +89,13 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
 
                 <button 
                     onClick={onPlayAgain}
-                    className="w-full bg-green-500 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-400 transition-colors mb-4"
+                    class="w-full bg-green-500 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-400 transition-colors mb-4"
                 >
                     Play again!
                 </button>
                 <button 
                     onClick={onLeaveRoom}
-                    className="w-full bg-gray-700 text-gray-300 py-3 rounded-lg font-bold text-lg hover:bg-gray-600 transition-colors"
+                    class="w-full bg-gray-700 text-gray-300 py-3 rounded-lg font-bold text-lg hover:bg-gray-600 transition-colors"
                 >
                     Leave room ({countdown})
                 </button>
