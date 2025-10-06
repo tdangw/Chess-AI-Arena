@@ -90,7 +90,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
                     
                     <div className="pt-2">
-                       {renderSelect('music-select', 'Select Music', 0, (val) => onSelectTrack(musicTracks[val]), musicTracks.map((track, i) => ({label: track, value: i})))}
+                       {renderSelect(
+  'music-select',
+  'Select Music',
+  Math.max(0, musicTracks.indexOf(selectedTrack)),
+  (val) => onSelectTrack(musicTracks[val]),
+  musicTracks.map((track, i) => ({ label: track, value: i }))
+)}
                     </div>
                     {context === 'menu' && (
                          <div className="pt-2 grid grid-cols-2 gap-4">

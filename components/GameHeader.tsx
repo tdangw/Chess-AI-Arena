@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Player, AIOpponent } from '../types';
 import { SettingsIcon, UndoIcon, EmojiIcon, HintIcon, ResignIcon } from './icons';
-import { TURN_DURATION_SECONDS } from '../constants';
 import EmojiPicker from './EmojiPicker';
 
 interface GameHeaderProps {

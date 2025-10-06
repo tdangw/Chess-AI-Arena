@@ -30,8 +30,6 @@ export interface Move {
   to: Position;
 }
 
-export type BoardState = (Piece | null)[][];
-
 export interface Skin {
   id: string;
   name: string;

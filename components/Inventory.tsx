@@ -18,7 +18,6 @@ interface InventoryProps {
 type InventoryTab = 'skins' | 'avatars' | 'themes' | 'emojis';
 
 const SkinPreview: React.FC<{ skinId: string }> = ({ skinId }) => {
-    const isRed = true; // Always show red for preview
     let skinClasses = 'w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ease-in-out';
     let textClasses = 'relative z-10 text-4xl';
     let textStyles: React.CSSProperties = { textShadow: '1px 1px 3px rgba(0,0,0,0.7)' };
