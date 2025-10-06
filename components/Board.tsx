@@ -39,7 +39,7 @@ const PalaceLine = ({ x1, y1, x2, y2, color }: { x1: number; y1: number; x2: num
 
     return (
         <div
-            className={`absolute h-[1.5px] origin-top-left ${color}`}
+            class={`absolute h-[1.5px] origin-top-left ${color}`}
             style={{
                 left: `${left1}%`,
                 top: `${top1}%`,
@@ -68,17 +68,17 @@ const PositionMarker: React.FC<PositionMarkerProps> = ({ pos, color }) => {
     return (
         <>
             {/* Top-left */}
-            {pos.x > 0 && <div className={`${baseClasses} ${hLine}`} style={{ top, left, transform: `translate(calc(-100% - ${gap}), -50%)` }} />}
-            {pos.x > 0 && <div className={`${baseClasses} ${vLine}`} style={{ top, left, transform: `translate(-50%, calc(-100% - ${gap}))` }} />}
+            {pos.x > 0 && <div class={`${baseClasses} ${hLine}`} style={{ top, left, transform: `translate(calc(-100% - ${gap}), -50%)` }} />}
+            {pos.x > 0 && <div class={`${baseClasses} ${vLine}`} style={{ top, left, transform: `translate(-50%, calc(-100% - ${gap}))` }} />}
             {/* Top-right */}
-            {pos.x < BOARD_WIDTH - 1 && <div className={`${baseClasses} ${hLine}`} style={{ top, left, transform: `translate(${gap}, -50%)` }} />}
-            {pos.x < BOARD_WIDTH - 1 && <div className={`${baseClasses} ${vLine}`} style={{ top, left, transform: `translate(-50%, calc(-100% - ${gap}))` }} />}
+            {pos.x < BOARD_WIDTH - 1 && <div class={`${baseClasses} ${hLine}`} style={{ top, left, transform: `translate(${gap}, -50%)` }} />}
+            {pos.x < BOARD_WIDTH - 1 && <div class={`${baseClasses} ${vLine}`} style={{ top, left, transform: `translate(-50%, calc(-100% - ${gap}))` }} />}
             {/* Bottom-left */}
-            {pos.x > 0 && <div className={`${baseClasses} ${hLine}`} style={{ top, left, transform: `translate(calc(-100% - ${gap}), -50%)` }} />}
-            {pos.x > 0 && <div className={`${baseClasses} ${vLine}`} style={{ top, left, transform: `translate(-50%, ${gap})` }} />}
+            {pos.x > 0 && <div class={`${baseClasses} ${hLine}`} style={{ top, left, transform: `translate(calc(-100% - ${gap}), -50%)` }} />}
+            {pos.x > 0 && <div class={`${baseClasses} ${vLine}`} style={{ top, left, transform: `translate(-50%, ${gap})` }} />}
             {/* Bottom-right */}
-            {pos.x < BOARD_WIDTH - 1 && <div className={`${baseClasses} ${hLine}`} style={{ top, left, transform: `translate(${gap}, -50%)` }} />}
-            {pos.x < BOARD_WIDTH - 1 && <div className={`${baseClasses} ${vLine}`} style={{ top, left, transform: `translate(-50%, ${gap})` }} />}
+            {pos.x < BOARD_WIDTH - 1 && <div class={`${baseClasses} ${hLine}`} style={{ top, left, transform: `translate(${gap}, -50%)` }} />}
+            {pos.x < BOARD_WIDTH - 1 && <div class={`${baseClasses} ${vLine}`} style={{ top, left, transform: `translate(-50%, ${gap})` }} />}
         </>
     );
 };
@@ -99,16 +99,16 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
         const lines = [];
         // Vertical lines (split for river)
         for (let i = 1; i < BOARD_WIDTH - 1; i++) {
-            lines.push(<div key={`v-${i}-t`} className={`absolute ${lineColor}`} style={{ left: `calc(${(i / (BOARD_WIDTH - 1)) * 100}%)`, top: 0, height: `calc(4 / 9 * 100%)`, width: '1px', transform: 'translateX(-0.5px)' }}></div>);
-            lines.push(<div key={`v-${i}-b`} className={`absolute ${lineColor}`} style={{ left: `calc(${(i / (BOARD_WIDTH - 1)) * 100}%)`, bottom: 0, height: `calc(4 / 9 * 100%)`, width: '1px', transform: 'translateX(-0.5px)' }}></div>);
+            lines.push(<div key={`v-${i}-t`} class={`absolute ${lineColor}`} style={{ left: `calc(${(i / (BOARD_WIDTH - 1)) * 100}%)`, top: 0, height: `calc(4 / 9 * 100%)`, width: '1px', transform: 'translateX(-0.5px)' }}></div>);
+            lines.push(<div key={`v-${i}-b`} class={`absolute ${lineColor}`} style={{ left: `calc(${(i / (BOARD_WIDTH - 1)) * 100}%)`, bottom: 0, height: `calc(4 / 9 * 100%)`, width: '1px', transform: 'translateX(-0.5px)' }}></div>);
         }
         // Horizontal lines
         for (let i = 0; i < BOARD_HEIGHT; i++) {
-            lines.push(<div key={`h-${i}`} className={`absolute ${lineColor}`} style={{ top: `calc(${(i / (BOARD_HEIGHT - 1)) * 100}%)`, left:0, right: 0, height: '1.5px', transform: 'translateY(-0.75px)' }}></div>);
+            lines.push(<div key={`h-${i}`} class={`absolute ${lineColor}`} style={{ top: `calc(${(i / (BOARD_HEIGHT - 1)) * 100}%)`, left:0, right: 0, height: '1.5px', transform: 'translateY(-0.75px)' }}></div>);
         }
         // Full-height vertical borders
-        lines.push(<div key="v-left" className={`absolute ${lineColor}`} style={{ left: 0, top: 0, bottom: 0, width: '2px' }}></div>);
-        lines.push(<div key="v-right" className={`absolute ${lineColor}`} style={{ right: 0, top: 0, bottom: 0, width: '2px' }}></div>);
+        lines.push(<div key="v-left" class={`absolute ${lineColor}`} style={{ left: 0, top: 0, bottom: 0, width: '2px' }}></div>);
+        lines.push(<div key="v-right" class={`absolute ${lineColor}`} style={{ right: 0, top: 0, bottom: 0, width: '2px' }}></div>);
 
         return lines;
     };
@@ -120,7 +120,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
                 const pos = { x, y };
                 squares.push(
                     <div key={`${x}-${y}`} 
-                         className="absolute" 
+                         class="absolute" 
                          style={{
                             width: `calc(100% / ${BOARD_WIDTH - 1})`,
                             height: `calc(100% / ${BOARD_HEIGHT - 1})`,
@@ -148,7 +148,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
     }
 
     return (
-        <div className={boardClasses}>
+        <div class={boardClasses}>
             <style>{`
                 @keyframes red-glow-pulse {
                     50% {
@@ -169,8 +169,8 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
                 }
             `}</style>
             {isSummerTheme && (
-                <div className="absolute inset-0 overflow-hidden rounded-md pointer-events-none">
-                    <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-br from-yellow-200/30 via-transparent to-transparent animate-sun-shimmer"></div>
+                <div class="absolute inset-0 overflow-hidden rounded-md pointer-events-none">
+                    <div class="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-br from-yellow-200/30 via-transparent to-transparent animate-sun-shimmer"></div>
                 </div>
             )}
             {renderGridLines()}
@@ -181,10 +181,10 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
             
             {MARKER_POSITIONS.map((pos, i) => <PositionMarker key={`marker-${i}`} pos={pos} color={lineColor} />)}
 
-            <div className={riverTextClasses}>
-                 <div className="flex items-baseline justify-center space-x-2 whitespace-nowrap">
+            <div class={riverTextClasses}>
+                 <div class="flex items-baseline justify-center space-x-2 whitespace-nowrap">
                     <span>CỜ TƯỚNG AI ARENA</span>
-                    <span className="text-xs font-sans font-normal tracking-normal opacity-70">by tdangw</span>
+                    <span class="text-xs font-sans font-normal tracking-normal opacity-70">by tdangw</span>
                 </div>
             </div>
           
@@ -192,7 +192,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
 
             {lastMove && (
                 <div
-                    className="absolute w-5 h-5 bg-amber-500/40 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                    class="absolute w-5 h-5 bg-amber-500/40 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                     style={{
                         left: `calc(${(lastMove.from.x / (BOARD_WIDTH - 1)) * 100}%)`,
                         top: `calc(${(lastMove.from.y / (BOARD_HEIGHT - 1)) * 100}%)`,
@@ -210,7 +210,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
                      return (
                         <div
                             key={`capture-${i}`}
-                            className="absolute w-12 h-12 md:w-14 md:h-14 border-4 border-red-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-red-glow-pulse"
+                            class="absolute w-12 h-12 md:w-14 md:h-14 border-4 border-red-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-red-glow-pulse"
                             style={{
                                 ...style,
                                 boxShadow: '0 0 15px rgba(239, 68, 68, 0.7)',
@@ -221,7 +221,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
                     return (
                         <div
                             key={`valid-${i}`}
-                            className="absolute w-5 h-5 bg-green-500/50 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                            class="absolute w-5 h-5 bg-green-500/50 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                             style={style}
                         />
                     );
@@ -230,13 +230,13 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
 
             {hintMove && (
                 <>
-                    <div className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 ring-offset-4 ${ringOffsetColor} animate-pulse`}
+                    <div class={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 ring-offset-4 ${ringOffsetColor} animate-pulse`}
                         style={{
                             left: `calc(${(hintMove.from.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(hintMove.from.y / (BOARD_HEIGHT - 1)) * 100}%)`,
                         }}
                     />
-                    <div className="absolute w-12 h-12 md:w-14 md:h-14 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 animate-pulse"
+                    <div class="absolute w-12 h-12 md:w-14 md:h-14 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 animate-pulse"
                         style={{
                             left: `calc(${(hintMove.to.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(hintMove.to.y / (BOARD_HEIGHT - 1)) * 100}%)`,
@@ -247,13 +247,13 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
 
             {aiThinkingMove && (
                  <>
-                    <div className="absolute w-11 h-11 md:w-12 md:h-12 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
+                    <div class="absolute w-11 h-11 md:w-12 md:h-12 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
                         style={{
                             left: `calc(${(aiThinkingMove.from.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(aiThinkingMove.from.y / (BOARD_HEIGHT - 1)) * 100}%)`,
                         }}
                     />
-                    <div className="absolute w-11 h-11 md:w-12 md:h-12 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
+                    <div class="absolute w-11 h-11 md:w-12 md:h-12 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
                         style={{
                             left: `calc(${(aiThinkingMove.to.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(aiThinkingMove.to.y / (BOARD_HEIGHT - 1)) * 100}%)`,

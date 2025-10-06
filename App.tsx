@@ -40,9 +40,9 @@ const FirstMoveAnimation: React.FC<FirstMoveAnimationProps> = ({ onAnimationEnd,
     }, [firstPlayer, onAnimationEnd]);
     
     return (
-        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center rounded-lg z-50">
-            <div className="relative w-48 h-24">
-                <div className={`absolute top-0 w-24 h-24 transition-all duration-500 ease-out flex items-center justify-center ${winner ? (winner === Player.Red ? 'left-1/2 -translate-x-1/2 scale-125' : 'left-0 opacity-0 -translate-x-full') : 'left-0 animate-slide-in-left'}`}>
+        <div class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center rounded-lg z-50">
+            <div class="relative w-48 h-24">
+                <div class={`absolute top-0 w-24 h-24 transition-all duration-500 ease-out flex items-center justify-center ${winner ? (winner === Player.Red ? 'left-1/2 -translate-x-1/2 scale-125' : 'left-0 opacity-0 -translate-x-full') : 'left-0 animate-slide-in-left'}`}>
                     <PieceComponent 
                         piece={redGeneral}
                         isSelected={false}
@@ -53,7 +53,7 @@ const FirstMoveAnimation: React.FC<FirstMoveAnimationProps> = ({ onAnimationEnd,
                         isDraggable={false}
                     />
                 </div>
-                <div className={`absolute top-0 w-24 h-24 transition-all duration-500 ease-out flex items-center justify-center ${winner ? (winner === Player.Black ? 'left-1/2 -translate-x-1/2 scale-125' : 'right-0 opacity-0 translate-x-full') : 'right-0 animate-slide-in-right'}`}>
+                <div class={`absolute top-0 w-24 h-24 transition-all duration-500 ease-out flex items-center justify-center ${winner ? (winner === Player.Black ? 'left-1/2 -translate-x-1/2 scale-125' : 'right-0 opacity-0 translate-x-full') : 'right-0 animate-slide-in-right'}`}>
                     <PieceComponent 
                         piece={blackGeneral}
                         isSelected={false}
@@ -65,7 +65,7 @@ const FirstMoveAnimation: React.FC<FirstMoveAnimationProps> = ({ onAnimationEnd,
                     />
                 </div>
             </div>
-            <p className="text-white font-semibold text-xl mt-4 transition-opacity duration-300">
+            <p class="text-white font-semibold text-xl mt-4 transition-opacity duration-300">
                 {winner ? `${winner === Player.Red ? 'You go' : 'AI goes'} first!` : 'Deciding who goes first...'}
             </p>
             <style>{`
@@ -457,7 +457,7 @@ const App: React.FC = () => {
                 />;
             case 'game':
                 return (
-                    <div className="min-h-screen w-full bg-[#0F172A] text-white flex flex-col items-center justify-start pt-1 px-2 sm:px-4 font-sans relative overflow-hidden">
+                    <div class="min-h-screen w-full bg-[#0F172A] text-white flex flex-col items-center justify-start pt-1 px-2 sm:px-4 font-sans relative overflow-hidden">
                          <style>{`
                             @keyframes zoom-in-out {
                                 0% { transform: scale(0.5); opacity: 0; }
@@ -526,7 +526,7 @@ const App: React.FC = () => {
                             opponent={currentOpponent}
                         />
 
-                        <div className="w-full max-w-sm md:max-w-md mx-auto mt-5 sm:mt-7">
+                        <div class="w-full max-w-sm md:max-w-md mx-auto mt-5 sm:mt-7">
                             <Board
                                 pieces={pieces}
                                 selectedPiece={selectedPiece}
@@ -540,18 +540,18 @@ const App: React.FC = () => {
                                 equippedTheme={equippedTheme}
                                 currentPlayer={currentPlayer}
                             />
-                             <div className="mt-2 grid grid-cols-2 gap-2 h-20">
-                                <div className="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
+                             <div class="mt-2 grid grid-cols-2 gap-2 h-20">
+                                <div class="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
                                     {capturedBlackPieces.map(piece => (
-                                        <div key={piece.id} title={piece.type} className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-gray-700 to-gray-900 border border-black shadow-sm">
-                                            <span className="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
+                                        <div key={piece.id} title={piece.type} class="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-gray-700 to-gray-900 border border-black shadow-sm">
+                                            <span class="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
+                                <div class="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
                                     {capturedRedPieces.map(piece => (
-                                        <div key={piece.id} title={piece.type} className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-red-500 to-red-800 border border-red-900 shadow-sm">
-                                            <span className="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
+                                        <div key={piece.id} title={piece.type} class="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-red-500 to-red-800 border border-red-900 shadow-sm">
+                                            <span class="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -559,9 +559,9 @@ const App: React.FC = () => {
                         </div>
                         
                         {animatingEmoji && (
-                             <div className={`absolute top-0 h-full w-24 z-30 pointer-events-none ${animatingEmoji.from === 'player' ? 'left-[calc(50%-13rem)]' : 'right-[calc(50%-13rem)]'} `}>
-                                <div className="relative w-full h-full">
-                                    <span className="absolute top-[60px] text-7xl animate-fall-and-settle" style={{ textShadow: '0 0 15px rgba(0,0,0,0.5)' }}>
+                             <div class={`absolute top-0 h-full w-24 z-30 pointer-events-none ${animatingEmoji.from === 'player' ? 'left-[calc(50%-13rem)]' : 'right-[calc(50%-13rem)]'} `}>
+                                <div class="relative w-full h-full">
+                                    <span class="absolute top-[60px] text-7xl animate-fall-and-settle" style={{ textShadow: '0 0 15px rgba(0,0,0,0.5)' }}>
                                         {animatingEmoji.emoji}
                                     </span>
                                 </div>
@@ -569,16 +569,16 @@ const App: React.FC = () => {
                         )}
                         
                          {showEndGameAnimation && (
-                            <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
-                                <h1 className={`text-6xl md:text-7xl font-extrabold animate-zoom-in-out ${showEndGameAnimation === 'win' ? 'text-green-400' : 'text-red-500'}`}
+                            <div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+                                <h1 class={`text-6xl md:text-7xl font-extrabold animate-zoom-in-out ${showEndGameAnimation === 'win' ? 'text-green-400' : 'text-red-500'}`}
                                     style={{ textShadow: '0 0 20px rgba(0,0,0,0.7)', transform: 'translateY(-2rem)' }}>
                                     {showEndGameAnimation === 'win' ? 'YOU WIN!' : 'YOU LOSE!'}
                                 </h1>
                             </div>
                         )}
                         {showCheckWarning && (
-                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[150%] z-30 pointer-events-none">
-                                <h2 className="text-4xl md:text-5xl font-bold text-yellow-400 animate-check-warning" style={{ textShadow: '0 0 10px #000' }}>
+                             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[150%] z-30 pointer-events-none">
+                                <h2 class="text-4xl md:text-5xl font-bold text-yellow-400 animate-check-warning" style={{ textShadow: '0 0 10px #000' }}>
                                     CHECK!
                                 </h2>
                             </div>
@@ -618,7 +618,7 @@ const App: React.FC = () => {
     }
 
     return (
-        <div className="w-full min-h-screen bg-[#0F172A]">
+        <div class="w-full min-h-screen bg-[#0F172A]">
             {renderView()}
             {isSettingsOpen && (
                 <SettingsModal
