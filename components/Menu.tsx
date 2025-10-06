@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { CoinIcon, PencilIcon, ShopIcon, InventoryIcon, SettingsIcon, GlobeIcon } from './icons';
-import { Skin } from '../types';
+import { Skin, PieceType as PieceEnum } from '../types';
 import { SHOP_ITEMS } from '../constants';
 import { audioService } from '../services/audioService';
 

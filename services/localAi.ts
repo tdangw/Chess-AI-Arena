@@ -1,4 +1,3 @@
-// @ts-ignore
 import { Piece, Player, Position, Move, PieceType } from '../types';
 import { EMOJI_ITEMS } from '../constants';
 
@@ -132,14 +131,69 @@ const workerCode = `
         }
         return 0;
     };
+    
+    const evaluateDoubleCannonThreat = (pieces, player) => {
+        const opponent = player === Player.Red ? Player.Black : Player.Red;
+        const opponentGeneral = pieces.find(p => p.type === PieceType.General && p.player === opponent);
+        if (!opponentGeneral) return 0;
+
+        const piecesOnColumn = pieces
+            .filter(p => p.position.x === opponentGeneral.position.x)
+            .sort((a, b) => a.position.y - b.position.y);
+
+        if (piecesOnColumn.length < 3) return 0;
+        
+        const generalIndex = piecesOnColumn.findIndex(p => p.id === opponentGeneral.id);
+        if (generalIndex === -1) return 0;
+
+        // Check for the pattern: General, Screen, Cannon
+        if (generalIndex + 2 < piecesOnColumn.length) {
+            const screen = piecesOnColumn[generalIndex + 1];
+            const backCannon = piecesOnColumn[generalIndex + 2];
+            if (backCannon.type === PieceType.Cannon && backCannon.player === player) {
+                const otherCannons = pieces.filter(p => p.type === PieceType.Cannon && p.player === player && p.id !== backCannon.id);
+                for (const frontCannon of otherCannons) {
+                    if (isValidMoveForPiece(pieces, frontCannon, screen.position)) {
+                        return 3000; // Direct checkmate threat
+                    }
+                }
+            }
+        }
+
+        // Check for the pattern in reverse: Cannon, Screen, General
+        if (generalIndex - 2 >= 0) {
+            const screen = piecesOnColumn[generalIndex - 1];
+            const backCannon = piecesOnColumn[generalIndex - 2];
+            if (backCannon.type === PieceType.Cannon && backCannon.player === player) {
+                 const otherCannons = pieces.filter(p => p.type === PieceType.Cannon && p.player === player && p.id !== backCannon.id);
+                for (const frontCannon of otherCannons) {
+                    if (isValidMoveForPiece(pieces, frontCannon, screen.position)) {
+                        return 3000; // Direct checkmate threat
+                    }
+                }
+            }
+        }
+        
+        return 0;
+    }
+
     const evaluateBoard = (pieces, player) => {
         let score = 0;
+        const opponent = player === Player.Red ? Player.Black : Player.Red;
+
+        if (isCheck(pieces, player)) score -= 5000;
+        if (isCheck(pieces, opponent)) score += 500;
+        
+        score += evaluateDoubleCannonThreat(pieces, player);
+        score -= evaluateDoubleCannonThreat(pieces, opponent);
+
         for (const piece of pieces) {
             const value = PIECE_VALUES[piece.type] + getPositionalValue(piece);
             score += (piece.player === player ? value : -value);
         }
         return score;
     };
+    
     const boardToStateString = (pieces) => {
         return pieces.slice().sort((a, b) => a.id - b.id).map(p => \`\${p.id}@\${p.position.x},\${p.position.y}\`).join(';');
     };
@@ -235,47 +289,44 @@ const workerCode = `
 let aiWorker: Worker | null = null;
 
 export const getLocalAIMove = async (
-  pieces: Piece[],
-  aiPlayer: Player,
-  moveHistory: Piece[][],
-  difficulty: 'easy' | 'medium' | 'hard',
-  onProgress: (move: Move) => void
+    pieces: Piece[], 
+    aiPlayer: Player, 
+    moveHistory: Piece[][],
+    difficulty: 'easy' | 'medium' | 'hard',
+    onProgress: (move: Move) => void
 ): Promise<{ move: Move; emoji?: string } | null> => {
-  if (aiWorker) {
-    aiWorker.terminate();
-  }
 
-  const workerScript = `const EMOJI_ITEMS = ${JSON.stringify(
-    EMOJI_ITEMS
-  )};\n${workerCode}`;
-  const workerBlob = new Blob([workerScript], {
-    type: 'application/javascript',
-  });
-  aiWorker = new Worker(URL.createObjectURL(workerBlob));
-
-  return new Promise((resolve, reject) => {
-    if (!aiWorker) {
-      reject(new Error('Worker could not be created.'));
-      return;
+    if (aiWorker) {
+        aiWorker.terminate();
     }
 
-    aiWorker.onmessage = (e) => {
-      if (e.data.type === 'progress') {
-        onProgress(e.data.move);
-      } else if (e.data.type === 'result') {
-        if (aiWorker) aiWorker.terminate();
-        aiWorker = null;
-        resolve(e.data.data);
-      }
-    };
+    const workerScript = `const EMOJI_ITEMS = ${JSON.stringify(EMOJI_ITEMS)};\n${workerCode}`;
+    const workerBlob = new Blob([workerScript], { type: 'application/javascript' });
+    aiWorker = new Worker(URL.createObjectURL(workerBlob));
+    
+    return new Promise((resolve, reject) => {
+        if (!aiWorker) {
+            reject(new Error("Worker could not be created."));
+            return;
+        }
 
-    aiWorker.onerror = (e) => {
-      console.error('AI Worker Error:', e);
-      if (aiWorker) aiWorker.terminate();
-      aiWorker = null;
-      reject(e);
-    };
+        aiWorker.onmessage = (e) => {
+            if (e.data.type === 'progress') {
+                onProgress(e.data.move);
+            } else if (e.data.type === 'result') {
+                if (aiWorker) aiWorker.terminate();
+                aiWorker = null;
+                resolve(e.data.data);
+            }
+        };
 
-    aiWorker.postMessage({ pieces, aiPlayer, moveHistory, difficulty });
-  });
+        aiWorker.onerror = (e) => {
+            console.error('AI Worker Error:', e);
+            if (aiWorker) aiWorker.terminate();
+            aiWorker = null;
+            reject(e);
+        };
+
+        aiWorker.postMessage({ pieces, aiPlayer, moveHistory, difficulty });
+    });
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Piece as PieceType, Position, Player, Move } from '../types';
 import Piece from './Piece';
@@ -192,7 +191,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
 
             {lastMove && (
                 <div
-                    className="absolute w-5 h-5 bg-amber-500/40 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                    className="absolute w-3 h-3 bg-amber-500/40 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                     style={{
                         left: `calc(${(lastMove.from.x / (BOARD_WIDTH - 1)) * 100}%)`,
                         top: `calc(${(lastMove.from.y / (BOARD_HEIGHT - 1)) * 100}%)`,
@@ -210,7 +209,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
                      return (
                         <div
                             key={`capture-${i}`}
-                            className="absolute w-12 h-12 md:w-14 md:h-14 border-4 border-red-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-red-glow-pulse"
+                            className="absolute w-10 h-10 md:w-11 md:h-11 border-4 border-red-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-red-glow-pulse"
                             style={{
                                 ...style,
                                 boxShadow: '0 0 15px rgba(239, 68, 68, 0.7)',
@@ -221,7 +220,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
                     return (
                         <div
                             key={`valid-${i}`}
-                            className="absolute w-5 h-5 bg-green-500/50 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                            className="absolute w-3 h-3 bg-green-500/50 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                             style={style}
                         />
                     );
@@ -230,13 +229,13 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
 
             {hintMove && (
                 <>
-                    <div className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 ring-offset-4 ${ringOffsetColor} animate-pulse`}
+                    <div className={`absolute w-10 h-10 md:w-11 md:h-11 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 ring-offset-4 ${ringOffsetColor} animate-pulse`}
                         style={{
                             left: `calc(${(hintMove.from.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(hintMove.from.y / (BOARD_HEIGHT - 1)) * 100}%)`,
                         }}
                     />
-                    <div className="absolute w-12 h-12 md:w-14 md:h-14 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 animate-pulse"
+                    <div className="absolute w-10 h-10 md:w-11 md:h-11 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none ring-4 ring-blue-500 animate-pulse"
                         style={{
                             left: `calc(${(hintMove.to.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(hintMove.to.y / (BOARD_HEIGHT - 1)) * 100}%)`,
@@ -247,13 +246,13 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
 
             {aiThinkingMove && (
                  <>
-                    <div className="absolute w-11 h-11 md:w-12 md:h-12 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
+                    <div className="absolute w-9 h-9 md:w-10 md:h-10 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
                         style={{
                             left: `calc(${(aiThinkingMove.from.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(aiThinkingMove.from.y / (BOARD_HEIGHT - 1)) * 100}%)`,
                         }}
                     />
-                    <div className="absolute w-11 h-11 md:w-12 md:h-12 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
+                    <div className="absolute w-9 h-9 md:w-10 md:h-10 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-pink-500/30 animate-thinking-pulse"
                         style={{
                             left: `calc(${(aiThinkingMove.to.x / (BOARD_WIDTH - 1)) * 100}%)`,
                             top: `calc(${(aiThinkingMove.to.y / (BOARD_HEIGHT - 1)) * 100}%)`,

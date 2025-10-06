@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Player, Piece, Position, Move, Skin, Avatar, Theme, EmojiItem, PieceType, AIOpponent } from './types';
 import Board from './components/Board';
@@ -8,8 +7,9 @@ import Inventory from './components/Inventory';
 import GameHeader from './components/GameHeader';
 import EndGameModal from './components/EndGameModal';
 import SettingsModal from './components/SettingsModal';
+import ConfirmModal from './components/ConfirmModal';
 import PieceComponent from './components/Piece';
-import { INITIAL_PIECES, PIECE_UNICODE, TURN_DURATION_SECONDS, AVATAR_ITEMS, DEFAULT_GAME_TIME_SECONDS, AI_OPPONENTS } from './constants';
+import { INITIAL_PIECES, PIECE_UNICODE, TURN_DURATION_SECONDS, AVATAR_ITEMS, EMOJI_ITEMS, DEFAULT_GAME_TIME_SECONDS, AI_OPPONENTS, MUSIC_TRACKS } from './constants';
 import { getValidMoves, isCheckmate, isCheck } from './services/gameLogic';
 import { getLocalAIMove } from './services/localAi';
 import { audioService } from './services/audioService';
@@ -34,6 +34,11 @@ const FirstMoveAnimation: React.FC<FirstMoveAnimationProps> = ({ onAnimationEnd,
     useEffect(() => {
         const timer = setTimeout(() => {
             setWinner(firstPlayer);
+             if (firstPlayer === Player.Red) {
+                audioService.playFirstMovePlayerSound();
+            } else {
+                audioService.playFirstMoveAISound();
+            }
             setTimeout(() => onAnimationEnd(firstPlayer), 2000);
         }, 1500);
         return () => clearTimeout(timer);
@@ -116,6 +121,7 @@ const App: React.FC = () => {
     const [showFirstMoveAnimation, setShowFirstMoveAnimation] = useState(false);
     const [showCheckWarning, setShowCheckWarning] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [showResignConfirm, setShowResignConfirm] = useState(false);
     const [animatingEmoji, setAnimatingEmoji] = useState<{emoji: string, from: 'player' | 'ai'} | null>(null);
     const [gameDuration, setGameDuration] = useState(DEFAULT_GAME_TIME_SECONDS);
     const [turnDuration, setTurnDuration] = useState(TURN_DURATION_SECONDS);
@@ -126,17 +132,16 @@ const App: React.FC = () => {
     // Settings State
     const [soundEnabled, setSoundEnabled] = useState(true);
     const [musicEnabled, setMusicEnabled] = useState(true);
-    const [musicTrack, setMusicTrack] = useState('Celestial');
+    const [musicTrack, setMusicTrack] = useState(MUSIC_TRACKS[0].src);
+    const [soundVolume, setSoundVolume] = useState(1);
+    const [musicVolume, setMusicVolume] = useState(0.5);
 
     // Audio Effects
-    useEffect(() => {
-        audioService.setSoundEnabled(soundEnabled);
-    }, [soundEnabled]);
-
-    useEffect(() => {
-        const shouldPlayMusic = musicEnabled && (view === 'menu' || view === 'game');
-        audioService.setMusicEnabled(shouldPlayMusic);
-    }, [musicEnabled, view]);
+    useEffect(() => { audioService.setSoundEnabled(soundEnabled); }, [soundEnabled]);
+    useEffect(() => { audioService.setMusicEnabled(musicEnabled && (view === 'menu' || view === 'game')); }, [musicEnabled, view]);
+    useEffect(() => { audioService.setSoundVolume(soundVolume); }, [soundVolume]);
+    useEffect(() => { audioService.setMusicVolume(musicVolume); }, [musicVolume]);
+    useEffect(() => { audioService.changeMusic(musicTrack) }, [musicTrack]);
 
 
     // Navigation
@@ -147,7 +152,7 @@ const App: React.FC = () => {
             setCurrentOpponent(opponent);
         }
         setAiDifficulty(difficulty);
-        handleReset(false); // Don't play click sound again
+        handleReset(false);
         setView('game');
         setShowFirstMoveAnimation(true);
     };
@@ -178,12 +183,9 @@ const App: React.FC = () => {
             setTurnTimer(t => (t > 0 ? t - 1 : 0));
         }, 1000);
         
-        let gameInterval: number | undefined;
-        if (currentPlayer === Player.Red) { // Only tick game timer for the human player
-            gameInterval = setInterval(() => {
-                setGameTimer(t => (t > 0 ? t - 1 : 0));
-            }, 1000);
-        }
+        const gameInterval = (currentPlayer === Player.Red) ? setInterval(() => {
+            setGameTimer(t => (t > 0 ? t - 1 : 0));
+        }, 1000) : undefined;
         
         return () => {
             clearInterval(turnInterval);
@@ -219,7 +221,7 @@ const App: React.FC = () => {
             setPlayerCoins(c => c + coinsGained);
             setShowEndGameModal(true);
             setShowEndGameAnimation(null);
-        }, 3000); // Show modal after 3s animation
+        }, 3000);
     }, [playerXP]);
 
     useEffect(() => {
@@ -229,7 +231,7 @@ const App: React.FC = () => {
             const winnerByTime = currentPlayer === Player.Red ? Player.Black : Player.Red;
             endGame(winnerByTime);
         } else if (gameTimer === 0) {
-            endGame(Player.Black); // Player ran out of total time
+            endGame(Player.Black);
         }
     }, [turnTimer, gameTimer, currentPlayer, gameState, endGame]);
 
@@ -237,7 +239,7 @@ const App: React.FC = () => {
         if (playSound) audioService.playClickSound();
         const initialPiecesState = JSON.parse(JSON.stringify(INITIAL_PIECES));
         setPieces(initialPiecesState);
-        setCurrentPlayer(Player.Red); // Default starter, will be overwritten by animation
+        setCurrentPlayer(Player.Red);
         setSelectedPiece(null);
         setValidMoves([]);
         setLastMove(null);
@@ -266,7 +268,7 @@ const App: React.FC = () => {
         } else if (isCheck(currentPieces, nextPlayer)) {
             setGameState('check');
             setShowCheckWarning(true);
-            setTimeout(() => setShowCheckWarning(false), 2000); // Hide warning after 2s
+            setTimeout(() => setShowCheckWarning(false), 2000);
         } else {
             setGameState('playing');
         }
@@ -290,18 +292,17 @@ const App: React.FC = () => {
 
         setPieces(movedPieces);
         setLastMove({ from, to });
-        setHintMove(null); // Clear hint after move
+        setHintMove(null);
         setMoveHistory(hist => [...hist, JSON.parse(JSON.stringify(movedPieces))]);
         
         const nextPlayer = currentPlayer === Player.Red ? Player.Black : Player.Red;
         nextTurn(movedPieces, nextPlayer);
     }, [pieces, currentPlayer, nextTurn]);
 
-    // AI Move Effect
     useEffect(() => {
         if (currentPlayer === Player.Black && (gameState === 'playing' || gameState === 'check') && view === 'game' && !showFirstMoveAnimation) {
             const performAiMove = async () => {
-                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
+                await new Promise(resolve => setTimeout(resolve, 500));
                 
                 const aiResult = await getLocalAIMove(
                     pieces, 
@@ -311,13 +312,13 @@ const App: React.FC = () => {
                     (move) => setAiThinkingMove(move)
                 );
 
-                setAiThinkingMove(null); // Clear indicator
+                setAiThinkingMove(null);
 
                 if (aiResult && aiResult.move) {
                     makeMove(aiResult.move.from, aiResult.move.to);
                     if (aiResult.emoji) {
                         setTimeout(() => {
-                            setAnimatingEmoji({ emoji: aiResult.emoji ?? '✨', from: 'ai' });
+                            setAnimatingEmoji({ emoji: aiResult.emoji, from: 'ai' });
                             setTimeout(() => setAnimatingEmoji(null), 3500);
                         }, 700);
                     }
@@ -339,6 +340,7 @@ const App: React.FC = () => {
             if (isValid) {
                 makeMove(selectedPiece.position, pos);
             } else if (clickedPiece && clickedPiece.player === currentPlayer) {
+                audioService.playSelectSound();
                 setSelectedPiece(clickedPiece);
                 setValidMoves(getValidMoves(pieces, clickedPiece));
             } else {
@@ -347,6 +349,7 @@ const App: React.FC = () => {
             }
         } else {
             if (clickedPiece && clickedPiece.player === currentPlayer) {
+                audioService.playSelectSound();
                 setSelectedPiece(clickedPiece);
                 setValidMoves(getValidMoves(pieces, clickedPiece));
             }
@@ -355,6 +358,7 @@ const App: React.FC = () => {
 
     const handlePieceDragStart = (piece: Piece) => {
         if (gameState === 'checkmate' || piece.player !== Player.Red || showEndGameAnimation || showFirstMoveAnimation) return;
+        audioService.playSelectSound();
         setSelectedPiece(piece);
         setValidMoves(getValidMoves(pieces, piece));
     };
@@ -382,11 +386,10 @@ const App: React.FC = () => {
         const hintResult = await getLocalAIMove(pieces, Player.Red, moveHistory, 'easy', () => {});
         if (hintResult && hintResult.move) {
             setHintMove(hintResult.move);
-            setTimeout(() => setHintMove(null), 3000); // Hint visible for 3 seconds
+            setTimeout(() => setHintMove(null), 3000);
         }
     };
 
-    // Shop & Inventory Logic
     const handleBuyItem = (item: Skin | Avatar | Theme | EmojiItem, type: 'skin' | 'avatar' | 'theme' | 'emoji') => {
         audioService.playClickSound();
         if (playerCoins < item.price) return;
@@ -405,6 +408,12 @@ const App: React.FC = () => {
 
     const handleResign = () => {
         audioService.playClickSound();
+        setShowResignConfirm(true);
+    };
+    
+    const confirmResign = () => {
+        audioService.playClickSound();
+        setShowResignConfirm(false);
         setIsSettingsOpen(false);
         endGame(Player.Black);
     };
@@ -459,24 +468,13 @@ const App: React.FC = () => {
                 return (
                     <div className="min-h-screen w-full bg-[#0F172A] text-white flex flex-col items-center justify-start pt-1 px-2 sm:px-4 font-sans relative overflow-hidden">
                          <style>{`
-                            @keyframes zoom-in-out {
-                                0% { transform: scale(0.5); opacity: 0; }
-                                20% { transform: scale(1.2); opacity: 1; }
-                                80% { transform: scale(1); opacity: 1; }
-                                100% { transform: scale(1.5); opacity: 0; }
-                            }
-                            .animate-zoom-in-out {
-                                animation: zoom-in-out 3s ease-in-out forwards;
-                            }
-                             @keyframes fade-in-out-fast {
+                            @keyframes fade-in-out-fast {
                                 0% { opacity: 0; transform: scale(0.8); }
                                 20% { opacity: 1; transform: scale(1.1); }
                                 80% { opacity: 1; transform: scale(1); }
                                 100% { opacity: 0; transform: scale(0.9); }
                             }
-                            .animate-check-warning {
-                                animation: fade-in-out-fast 2s ease-in-out forwards;
-                            }
+                            .animate-check-warning { animation: fade-in-out-fast 2s ease-in-out forwards; }
                             @keyframes fall-and-settle {
                                 0% { transform: translateY(-50px) scale(0.3); opacity: 0; }
                                 50% { transform: translateY(calc(50vh - 120px)) scale(1.1); opacity: 1; animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
@@ -485,16 +483,50 @@ const App: React.FC = () => {
                                 90% { transform: translateY(calc(50vh - 120px)) scale(1); opacity: 1; }
                                 100% { transform: translateY(calc(50vh - 110px)) scale(0.9); opacity: 0; }
                             }
-                            .animate-fall-and-settle {
-                                animation: fall-and-settle 3.5s ease-out forwards;
-                            }
+                            .animate-fall-and-settle { animation: fall-and-settle 3.5s ease-out forwards; }
                             @keyframes sun-shimmer {
                                 0% { transform: rotate(45deg) translate(-100%, -100%); }
                                 100% { transform: rotate(45deg) translate(100%, 100%); }
                             }
-                            .animate-sun-shimmer {
-                                animation: sun-shimmer 12s linear infinite;
+                            .animate-sun-shimmer { animation: sun-shimmer 12s linear infinite; }
+                            
+                            /* New Win/Loss Animations */
+                            @keyframes confetti-fall {
+                                0% { transform: translateY(-10vh) rotateZ(0deg); opacity: 1; }
+                                100% { transform: translateY(100vh) rotateZ(360deg); opacity: 0; }
                             }
+                            .confetti {
+                                position: absolute;
+                                width: 10px;
+                                height: 10px;
+                                background-color: #fde047;
+                                opacity: 0;
+                                animation: confetti-fall 3s linear infinite;
+                            }
+                            @keyframes banner-in {
+                                0% { transform: scaleX(0); opacity: 0; }
+                                100% { transform: scaleX(1); opacity: 1; }
+                            }
+                            .animate-banner-in { animation: banner-in 0.5s 0.2s ease-out forwards; }
+
+                            @keyframes win-text-in {
+                                0% { transform: scale(0.5); opacity: 0; }
+                                50% { transform: scale(1.2); opacity: 1; }
+                                100% { transform: scale(1); opacity: 1; }
+                            }
+                            @keyframes win-text-shimmer {
+                                0%, 100% { text-shadow: 0 0 8px #fde047, 0 0 16px #facc15, 0 0 24px #eab308; }
+                                50% { text-shadow: 0 0 16px #fde047, 0 0 24px #facc15, 0 0 32px #eab308, 0 0 40px #ca8a04; }
+                            }
+                            .animate-win-text { 
+                                animation: win-text-in 1s ease-out forwards, win-text-shimmer 2s ease-in-out infinite; 
+                            }
+
+                            @keyframes lose-popup-in {
+                                0% { transform: scale(0.7) translateY(20px); opacity: 0; }
+                                100% { transform: scale(1) translateY(0); opacity: 1; }
+                            }
+                            .animate-lose-popup { animation: lose-popup-in 0.4s ease-out forwards; }
                         `}</style>
 
                         {showFirstMoveAnimation && (
@@ -526,7 +558,7 @@ const App: React.FC = () => {
                             opponent={currentOpponent}
                         />
 
-                        <div className="w-full max-w-sm md:max-w-md mx-auto mt-5 sm:mt-7">
+                        <div className="relative w-full max-w-sm md:max-w-md mx-auto mt-5 sm:mt-7 transition-all duration-500">
                             <Board
                                 pieces={pieces}
                                 selectedPiece={selectedPiece}
@@ -540,21 +572,53 @@ const App: React.FC = () => {
                                 equippedTheme={equippedTheme}
                                 currentPlayer={currentPlayer}
                             />
-                             <div className="mt-2 grid grid-cols-2 gap-2 h-20">
-                                <div className="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
-                                    {capturedBlackPieces.map(piece => (
-                                        <div key={piece.id} title={piece.type} className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-gray-700 to-gray-900 border border-black shadow-sm">
-                                            <span className="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
+                             {showEndGameAnimation && (
+                                <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+                                    {showEndGameAnimation === 'win' && (
+                                        <>
+                                            {Array.from({ length: 50 }).map((_, i) => (
+                                                <div key={i} className="confetti" style={{ left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 3}s`, animationDuration: `${2 + Math.random() * 2}s`, backgroundColor: ['#fde047', '#f9a8d4', '#67e8f9'][i%3] }}></div>
+                                            ))}
+                                            <div className="absolute w-full max-w-md h-32 bg-gradient-to-r from-transparent via-yellow-900/50 to-transparent animate-banner-in">
+                                                <div className="absolute inset-0 bg-repeat bg-center opacity-10" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23fbbf24\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'}}></div>
+                                            </div>
+                                            <h1 className="text-6xl md:text-7xl font-extrabold text-yellow-300 animate-win-text">
+                                                YOU WIN!
+                                            </h1>
+                                        </>
+                                    )}
+                                    {showEndGameAnimation === 'lose' && (
+                                        <div className="bg-slate-900/90 border-2 border-red-500 rounded-lg p-6 shadow-2xl animate-lose-popup">
+                                            <h1 className="text-5xl md:text-6xl font-extrabold text-red-500" style={{textShadow: '0 0 10px #000'}}>
+                                                YOU LOSE!
+                                            </h1>
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
-                                <div className="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
-                                    {capturedRedPieces.map(piece => (
-                                        <div key={piece.id} title={piece.type} className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-red-500 to-red-800 border border-red-900 shadow-sm">
-                                            <span className="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
-                                        </div>
-                                    ))}
+                            )}
+                            {showCheckWarning && (
+                                <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-yellow-400 animate-check-warning" style={{ textShadow: '0 0 10px #000' }}>
+                                        Chiếu tướng!
+                                    </h2>
                                 </div>
+                            )}
+                        </div>
+
+                        <div className="w-full max-w-sm md:max-w-md mx-auto mt-2 grid grid-cols-2 gap-2 h-20">
+                            <div className="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
+                                {capturedBlackPieces.map(piece => (
+                                    <div key={piece.id} title={piece.type} className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-gray-700 to-gray-900 border border-black shadow-sm">
+                                        <span className="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="bg-slate-800/30 rounded p-1 flex flex-wrap-reverse content-start items-start gap-1">
+                                {capturedRedPieces.map(piece => (
+                                    <div key={piece.id} title={piece.type} className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-b from-red-500 to-red-800 border border-red-900 shadow-sm">
+                                        <span className="text-white text-lg font-bold" style={{textShadow: '1px 1px 2px #000'}}>{PIECE_UNICODE[piece.player][piece.type]}</span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         
@@ -567,22 +631,6 @@ const App: React.FC = () => {
                                 </div>
                             </div>
                         )}
-                        
-                         {showEndGameAnimation && (
-                            <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
-                                <h1 className={`text-6xl md:text-7xl font-extrabold animate-zoom-in-out ${showEndGameAnimation === 'win' ? 'text-green-400' : 'text-red-500'}`}
-                                    style={{ textShadow: '0 0 20px rgba(0,0,0,0.7)', transform: 'translateY(-2rem)' }}>
-                                    {showEndGameAnimation === 'win' ? 'YOU WIN!' : 'YOU LOSE!'}
-                                </h1>
-                            </div>
-                        )}
-                        {showCheckWarning && (
-                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[150%] z-30 pointer-events-none">
-                                <h2 className="text-4xl md:text-5xl font-bold text-yellow-400 animate-check-warning" style={{ textShadow: '0 0 10px #000' }}>
-                                    CHECK!
-                                </h2>
-                            </div>
-                        )}
                        
                         {showEndGameModal && winner && (
                             <EndGameModal 
@@ -592,6 +640,17 @@ const App: React.FC = () => {
                                 initialXP={lastGameResult.initialXP}
                                 xpGained={lastGameResult.xpGained}
                                 coinsGained={lastGameResult.coinsGained}
+                            />
+                        )}
+                         {showResignConfirm && (
+                            <ConfirmModal
+                                title="Resign Game"
+                                message="Are you sure you want to resign? This will count as a loss."
+                                onConfirm={confirmResign}
+                                onCancel={() => {
+                                    audioService.playClickSound();
+                                    setShowResignConfirm(false);
+                                }}
                             />
                         )}
                     </div>
@@ -635,6 +694,10 @@ const App: React.FC = () => {
                     }}
                     selectedTrack={musicTrack}
                     onSelectTrack={setMusicTrack}
+                    soundVolume={soundVolume}
+                    onSetSoundVolume={setSoundVolume}
+                    musicVolume={musicVolume}
+                    onSetMusicVolume={setMusicVolume}
                     gameDuration={gameDuration}
                     onSetGameDuration={setGameDuration}
                     turnDuration={turnDuration}
@@ -643,7 +706,10 @@ const App: React.FC = () => {
                         audioService.playClickSound();
                         setIsSettingsOpen(false);
                     }}
-                    onResign={handleResign}
+                    onResign={() => {
+                        audioService.playClickSound();
+                        setShowResignConfirm(true);
+                    }}
                     onGoToShop={() => {
                         setIsSettingsOpen(false);
                         handleNavigate('shop');

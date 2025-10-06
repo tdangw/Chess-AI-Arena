@@ -1,4 +1,4 @@
-
+import React from 'react';
 
 export const SettingsIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -34,15 +34,19 @@ export const EmojiIcon = () => (
 
 export const HintIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M12 21a9 9 0 110-18 9 9 0 010 18z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75A5.25 5.25 0 0117.25 12c0 2.062-.97 3.93-2.484 5.116v1.384a.75.75 0 01-.75.75h-3.032a.75.75 0 01-.75-.75v-1.384C8.22 15.93 7.25 14.062 7.25 12A5.25 5.25 0 0112 6.75z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 21h6" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15.75a1.5 1.5 0 01-1.5-1.5V12a1.5 1.5 0 013 0v2.25a1.5 1.5 0 01-1.5 1.5z" />
     </svg>
 );
 
 export const ResignIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-13.5A1.5 1.5 0 014.5 6h15a1.5 1.5 0 010 3h-15" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v18h1.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 3h15l-4.5 6 4.5 6h-15" />
     </svg>
 );
+
 
 export const CoinIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">

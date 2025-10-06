@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Piece as PieceType, Player, PieceType as PieceEnum } from '../types';
 import { PIECE_UNICODE } from '../constants';
@@ -36,8 +35,8 @@ const Piece: React.FC<PieceProps> = ({ piece, isSelected, isLastMove, onPieceCli
   const pieceChar = PIECE_UNICODE[piece.player][piece.type];
   const isRed = piece.player === Player.Red;
 
-  const baseClasses = `absolute w-11 h-11 md:w-12 md:h-12 flex items-center justify-center 
-                       font-bold text-xl md:text-2xl transform -translate-x-1/2 -translate-y-1/2
+  const baseClasses = `absolute w-9 h-9 md:w-10 md:h-10 flex items-center justify-center 
+                       font-bold text-base md:text-lg transform -translate-x-1/2 -translate-y-1/2
                        transition-all duration-300 ease-in-out rounded-full`;
   
   const cursorClass = isDraggable ? 'cursor-grab' : 'cursor-pointer';

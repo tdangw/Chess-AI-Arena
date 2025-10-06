@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Player, AIOpponent } from '../types';
 import { SettingsIcon, UndoIcon, EmojiIcon, HintIcon, ResignIcon } from './icons';

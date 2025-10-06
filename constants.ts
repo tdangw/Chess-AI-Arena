@@ -137,3 +137,10 @@ export const AI_OPPONENTS: AIOpponent[] = [
         avatarUrl: 'https://i.pravatar.cc/150?u=ai_kael'
     }
 ];
+
+export const MUSIC_TRACKS: { name: string, src: string }[] = [
+    { name: 'Celestial', src: 'assets/sounds/music.mp3' },
+    { name: 'Battle Drums', src: 'assets/sounds/music_1.mp3' },
+    { name: 'Peaceful Garden', src: 'assets/sounds/music_2.mp3' },
+    { name: 'Synthwave Beats', src: 'assets/sounds/music_3.mp3' },
+];

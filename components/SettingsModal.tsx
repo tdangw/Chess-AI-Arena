@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { CloseIcon } from './icons';
 import { audioService } from '../services/audioService';
+import { MUSIC_TRACKS } from '../constants';
 
 interface SettingsModalProps {
     context: 'game' | 'menu';
@@ -10,7 +10,11 @@ interface SettingsModalProps {
     musicEnabled: boolean;
     onToggleMusic: () => void;
     selectedTrack: string;
-    onSelectTrack: (track: string) => void;
+    onSelectTrack: (trackSrc: string) => void;
+    soundVolume: number;
+    onSetSoundVolume: (volume: number) => void;
+    musicVolume: number;
+    onSetMusicVolume: (volume: number) => void;
     gameDuration: number;
     onSetGameDuration: (duration: number) => void;
     turnDuration: number;
@@ -27,11 +31,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     soundEnabled, onToggleSound, 
     musicEnabled, onToggleMusic, 
     selectedTrack, onSelectTrack, 
+    soundVolume, onSetSoundVolume,
+    musicVolume, onSetMusicVolume,
     gameDuration, onSetGameDuration,
     turnDuration, onSetTurnDuration,
     onClose, onResign, onGoToShop, onGoToInventory 
 }) => {
-    const musicTracks = ['Celestial', 'Battle Drums', 'Peaceful Garden', 'Synthwave Beats'];
     const gameDurations = [
         { label: '10 Min', value: 600 },
         { label: '15 Min', value: 900 },
@@ -44,19 +49,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         { label: '5 Min', value: 300 },
     ];
 
-    const renderSelect = (id: string, label: string, value: number, onChange: (val: number) => void, options: {label: string, value: number}[]) => (
+    const renderSelect = (id: string, label: string, value: string | number, onChange: (val: any) => void, options: {label: string, value: string | number}[]) => (
         <div>
-            <label htmlFor={id} className="font-semibold text-base mb-2 block">{label}</label>
+            <label htmlFor={id} className="font-semibold text-sm mb-1 block">{label}</label>
             <div className="relative">
                 <select
                     id={id}
                     value={value}
                     onChange={(e) => {
                         audioService.playClickSound();
-                        onChange(Number(e.target.value));
+                        onChange(e.target.value);
                     }}
                     onClick={() => audioService.playClickSound()}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500 text-xs"
                 >
                     {options.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
@@ -66,9 +71,43 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
         </div>
     );
+    
+     const renderSlider = (id: string, label: string, value: number, onChange: (val: number) => void) => (
+        <div>
+            <label htmlFor={id} className="font-semibold text-base mb-2 block">{label}</label>
+            <input
+                id={id}
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={value}
+                onChange={(e) => onChange(Number(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb"
+            />
+        </div>
+    );
 
     return (
         <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans">
+             <style>{`
+                .range-thumb::-webkit-slider-thumb {
+                  -webkit-appearance: none;
+                  appearance: none;
+                  width: 20px;
+                  height: 20px;
+                  background: #22d3ee; /* cyan-400 */
+                  border-radius: 50%;
+                  cursor: pointer;
+                }
+                .range-thumb::-moz-range-thumb {
+                  width: 20px;
+                  height: 20px;
+                  background: #22d3ee;
+                  border-radius: 50%;
+                  cursor: pointer;
+                }
+             `}</style>
             <div className="bg-[#1E293B] w-full max-w-sm rounded-2xl p-6 text-white border-2 border-gray-700 shadow-lg relative animate-fade-in-up">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
                     <CloseIcon />
@@ -76,32 +115,29 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <h2 className="text-3xl font-bold mb-6 text-center text-cyan-400">Settings</h2>
 
                 <div className="space-y-4">
-                    <div className="flex justify-between items-center border-b border-slate-700 pb-4">
+                    <div className="flex justify-between items-center">
                         <span className="font-semibold text-lg">Sound</span>
                         <button onClick={onToggleSound} className="text-lg font-bold text-cyan-400 w-16 text-center">
                             {soundEnabled ? 'ON' : 'OFF'}
                         </button>
                     </div>
-                    <div className="flex justify-between items-center border-b border-slate-700 pb-4">
+                     {renderSlider('sound-volume', 'Sound Volume', soundVolume, onSetSoundVolume)}
+
+                    <div className="flex justify-between items-center pt-2">
                         <span className="font-semibold text-lg">Music</span>
                         <button onClick={onToggleMusic} className="text-lg font-bold text-cyan-400 w-16 text-center">
                             {musicEnabled ? 'ON' : 'OFF'}
                         </button>
                     </div>
+                    {renderSlider('music-volume', 'Music Volume', musicVolume, onSetMusicVolume)}
                     
                     <div className="pt-2">
-                       {renderSelect(
-  'music-select',
-  'Select Music',
-  Math.max(0, musicTracks.indexOf(selectedTrack)),
-  (val) => onSelectTrack(musicTracks[val]),
-  musicTracks.map((track, i) => ({ label: track, value: i }))
-)}
+                       {renderSelect('music-select', 'Select Music', selectedTrack, (val) => onSelectTrack(val), MUSIC_TRACKS.map(track => ({label: track.name, value: track.src})))}
                     </div>
                     {context === 'menu' && (
                          <div className="pt-2 grid grid-cols-2 gap-4">
-                            {renderSelect('duration-select', 'Game Time', gameDuration, onSetGameDuration, gameDurations)}
-                            {renderSelect('turn-duration-select', 'Turn Time', turnDuration, onSetTurnDuration, turnDurations)}
+                            {renderSelect('duration-select', 'Game Time', gameDuration, (v) => onSetGameDuration(Number(v)), gameDurations)}
+                            {renderSelect('turn-duration-select', 'Turn Time', turnDuration, (v) => onSetTurnDuration(Number(v)), turnDurations)}
                         </div>
                     )}
                 </div>

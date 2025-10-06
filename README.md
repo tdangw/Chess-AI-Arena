@@ -8,8 +8,8 @@ This is a web-based Chinese Chess (Xiangqi) game built with React and TypeScript
 - Player progression system with XP and Coins.
 - In-game shop to purchase cosmetic items like board skins, avatars, and emojis.
 - Inventory to equip purchased items.
-- Customizable game settings, including timers and audio controls.
-- In-game features like Undo, Hints, and Resign.
+- Customizable game settings, including timers and audio controls with volume sliders.
+- In-game features like Undo, Hints, and Resign (with confirmation).
 - Responsive design for desktop, tablet, and mobile.
 - Audio feedback for game actions and UI interactions.
 
@@ -23,38 +23,58 @@ The application is set up to easily accept custom audio files for background mus
 
 You will need the following audio files, preferably in `.mp3` format for broad browser compatibility:
 
-- `music.mp3`: Background music for the menu and game.
+- `music.mp3`, `music_1.mp3`, etc.: Background music for the menu and game.
 - `move.mp3`: Sound for a standard piece move.
 - `capture.mp3`: Sound for capturing an opponent's piece.
-- `win.mp3`: Sound for winning a game.
-- `lose.mp3`: Sound for losing a game.
+- `select.mp3`: Sound for selecting a piece.
+- `announce_win.mp3`: Sound for winning a game.
+- `announce_lose.mp3`: Sound for losing a game.
+- `first_move_player.mp3`: Sound for when the player goes first.
+- `first_move_ai.mp3`: Sound for when the AI goes first.
 - `click.mp3`: A simple UI click sound for buttons.
 
-### 2. Place Files in the `assets` Directory
+### 2. Create the Directory and Place Files
 
-Create a new folder named `assets` in the root directory of your project (the same level as `index.html`). Place all your prepared audio files inside this `assets` folder.
+Inside your project's `public` folder, create a new folder named `assets`. Inside the `assets` folder, create another folder named `sounds`.
+
+Place all your prepared audio files inside the `public/assets/sounds` directory. The development server is configured to serve all files from the `public` directory.
 
 The final structure should look like this:
 
 ```
 /
-├── assets/
-│   ├── music.mp3
-│   ├── move.mp3
-│   ├── capture.mp3
-│   ├── win.mp3
-│   ├── lose.mp3
-│   └── click.mp3
+├── public/
+│   ├── assets/
+│   │   └── sounds/
+│   │       ├── music.mp3
+│   │       ├── music_1.mp3
+│   │       ├── move.mp3
+│   │       ├── capture.mp3
+│   │       ├── select.mp3
+│   │       ├── announce_win.mp3
+│   │       ├── announce_lose.mp3
+│   │       ├── first_move_player.mp3
+│   │       ├── first_move_ai.mp3
+│   │       └── click.mp3
+│   └── favicon.svg
 ├── components/
-├── services/
-├── index.html
-├── index.tsx
 └── ... (other files)
 ```
 
-### 3. That's It!
+### 3. Configure Music Tracks (Optional)
 
-The `services/audioService.ts` is already configured to look for these files in the `./assets/` directory. Once you add the files, they will automatically be used in the game. No code changes are necessary.
+If you add multiple background music files, you can make them available in the Settings menu. Open the `constants.ts` file and edit the `MUSIC_TRACKS` array to match your files:
+
+```typescript
+// in constants.ts
+export const MUSIC_TRACKS: { name: string, src: string }[] = [
+    { name: 'Celestial', src: 'assets/sounds/music.mp3' },
+    { name: 'Battle Drums', src: 'assets/sounds/music_1.mp3' },
+    // Add more tracks here
+];
+```
+
+The `services/audioService.ts` is configured to use these files. Once added correctly, they will automatically be used in the game.
 
 ---
 

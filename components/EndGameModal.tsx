@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Player } from '../types';
 import { CoinIcon } from './icons';
@@ -59,7 +58,7 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
     const barWidth = (currentLevelXP / MAX_XP_PER_LEVEL) * 100;
 
     return (
-        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans">
+        <div className="absolute inset-0 bg-black/70 flex items-start justify-center pt-16 z-50 font-sans">
             <div className="bg-[#1E293B] w-full max-w-sm rounded-2xl p-8 text-center text-white border-2 border-gray-700 shadow-lg animate-fade-in-up">
                 <h1 className={`text-6xl font-extrabold mb-4 ${isPlayerWinner ? 'text-green-400' : 'text-red-500'}`}>
                     {isPlayerWinner ? 'YOU WIN!' : 'YOU LOSE!'}
