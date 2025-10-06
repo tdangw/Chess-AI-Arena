@@ -1,5 +1,5 @@
 
-import { Piece, Player, PieceType, Position, BoardState } from '../types';
+import { Piece, Player, PieceType, Position } from '../types';
 import { BOARD_WIDTH, BOARD_HEIGHT } from '../constants';
 
 const isSamePosition = (pos1: Position, pos2: Position): boolean => {

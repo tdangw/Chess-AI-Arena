@@ -46,8 +46,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
     const renderSelect = (id: string, label: string, value: number, onChange: (val: number) => void, options: {label: string, value: number}[]) => (
         <div>
-            <label htmlFor={id} class="font-semibold text-base mb-2 block">{label}</label>
-            <div class="relative">
+            <label htmlFor={id} className="font-semibold text-base mb-2 block">{label}</label>
+            <div className="relative">
                 <select
                     id={id}
                     value={value}
@@ -56,44 +56,44 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         onChange(Number(e.target.value));
                     }}
                     onClick={() => audioService.playClickSound()}
-                    class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                 >
                     {options.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                 </div>
             </div>
         </div>
     );
 
     return (
-        <div class="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans">
-            <div class="bg-[#1E293B] w-full max-w-sm rounded-2xl p-6 text-white border-2 border-gray-700 shadow-lg relative animate-fade-in-up">
-                <button onClick={onClose} class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans">
+            <div className="bg-[#1E293B] w-full max-w-sm rounded-2xl p-6 text-white border-2 border-gray-700 shadow-lg relative animate-fade-in-up">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
                     <CloseIcon />
                 </button>
-                <h2 class="text-3xl font-bold mb-6 text-center text-cyan-400">Settings</h2>
+                <h2 className="text-3xl font-bold mb-6 text-center text-cyan-400">Settings</h2>
 
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center border-b border-slate-700 pb-4">
-                        <span class="font-semibold text-lg">Sound</span>
-                        <button onClick={onToggleSound} class="text-lg font-bold text-cyan-400 w-16 text-center">
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center border-b border-slate-700 pb-4">
+                        <span className="font-semibold text-lg">Sound</span>
+                        <button onClick={onToggleSound} className="text-lg font-bold text-cyan-400 w-16 text-center">
                             {soundEnabled ? 'ON' : 'OFF'}
                         </button>
                     </div>
-                    <div class="flex justify-between items-center border-b border-slate-700 pb-4">
-                        <span class="font-semibold text-lg">Music</span>
-                        <button onClick={onToggleMusic} class="text-lg font-bold text-cyan-400 w-16 text-center">
+                    <div className="flex justify-between items-center border-b border-slate-700 pb-4">
+                        <span className="font-semibold text-lg">Music</span>
+                        <button onClick={onToggleMusic} className="text-lg font-bold text-cyan-400 w-16 text-center">
                             {musicEnabled ? 'ON' : 'OFF'}
                         </button>
                     </div>
                     
-                    <div class="pt-2">
+                    <div className="pt-2">
                        {renderSelect('music-select', 'Select Music', 0, (val) => onSelectTrack(musicTracks[val]), musicTracks.map((track, i) => ({label: track, value: i})))}
                     </div>
                     {context === 'menu' && (
-                         <div class="pt-2 grid grid-cols-2 gap-4">
+                         <div className="pt-2 grid grid-cols-2 gap-4">
                             {renderSelect('duration-select', 'Game Time', gameDuration, onSetGameDuration, gameDurations)}
                             {renderSelect('turn-duration-select', 'Turn Time', turnDuration, onSetTurnDuration, turnDurations)}
                         </div>
@@ -102,23 +102,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 {context === 'game' ? (
                     <>
-                        <div class="mt-8 grid grid-cols-2 gap-4">
+                        <div className="mt-8 grid grid-cols-2 gap-4">
                             <button
                                 onClick={onGoToShop}
-                                class="w-full bg-purple-600 text-white py-3 rounded-lg font-bold text-base hover:bg-purple-500 transition-colors"
+                                className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold text-base hover:bg-purple-500 transition-colors"
                             >
                                 Shop
                             </button>
                             <button
                                 onClick={onGoToInventory}
-                                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-base hover:bg-indigo-500 transition-colors"
+                                className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-base hover:bg-indigo-500 transition-colors"
                             >
                                 Inventory
                             </button>
                         </div>
                         <button
                             onClick={onResign}
-                            class="w-full mt-4 bg-red-600 text-white py-3 rounded-lg font-bold text-base hover:bg-red-500 transition-colors"
+                            className="w-full mt-4 bg-red-600 text-white py-3 rounded-lg font-bold text-base hover:bg-red-500 transition-colors"
                         >
                             Resign Game
                         </button>
@@ -127,7 +127,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 <button
                     onClick={onClose}
-                    class="w-full mt-6 bg-slate-700 text-slate-200 py-3 rounded-lg font-bold text-base hover:bg-slate-600 transition-colors"
+                    className="w-full mt-6 bg-slate-700 text-slate-200 py-3 rounded-lg font-bold text-base hover:bg-slate-600 transition-colors"
                 >
                     Close
                 </button>

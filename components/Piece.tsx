@@ -87,7 +87,7 @@ const Piece: React.FC<PieceProps> = ({ piece, isSelected, isLastMove, onPieceCli
       onDragStart={onPieceDragStart}
       onDrop={onDrop}
       onDragOver={onDragOver}
-      class={`${baseClasses} ${skinClasses} ${selectedClass} ${lastMoveClass} ${cursorClass}`}
+      className={`${baseClasses} ${skinClasses} ${selectedClass} ${lastMoveClass} ${cursorClass}`}
       style={{
         left: `calc(${(piece.position.x / 8) * 100}%)`,
         top: `calc(${(piece.position.y / 9) * 100}%)`,
@@ -95,7 +95,7 @@ const Piece: React.FC<PieceProps> = ({ piece, isSelected, isLastMove, onPieceCli
     >
       {equippedSkin === 'western' 
         ? <WesternIcon type={piece.type} />
-        : <span class={textClasses} style={textStyles}>{pieceChar}</span>
+        : <span className={textClasses} style={textStyles}>{pieceChar}</span>
       }
     </button>
   );
