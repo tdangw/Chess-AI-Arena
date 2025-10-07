@@ -1,5 +1,5 @@
 import React from 'react';
-import { CloseIcon } from './icons';
+import { CloseIcon, ShopIcon, InventoryIcon } from './icons';
 import { audioService } from '../services/audioService';
 import { MUSIC_TRACKS } from '../constants';
 
@@ -20,8 +20,8 @@ interface SettingsModalProps {
     turnDuration: number;
     onSetTurnDuration: (duration: number) => void;
     onClose: () => void;
-    onGoToShop: () => void;
-    onGoToInventory: () => void;
+    onGoToShop?: () => void;
+    onGoToInventory?: () => void;
 }
 
 
@@ -34,7 +34,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     musicVolume, onSetMusicVolume,
     gameDuration, onSetGameDuration,
     turnDuration, onSetTurnDuration,
-    onClose, onGoToShop, onGoToInventory 
+    onClose,
+    onGoToShop,
+    onGoToInventory
 }) => {
     const gameDurations = [
         { label: '10 Min', value: 600 },
@@ -98,9 +100,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <h2 className="text-3xl font-bold mb-6 text-center text-cyan-400">Settings</h2>
 
                 <div className="space-y-5">
-                    <div>
-                        <label htmlFor="sound-volume" className="font-semibold text-lg mb-2 block">Sound</label>
-                        <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between gap-4">
+                        <label htmlFor="sound-volume" className="font-semibold text-lg flex-shrink-0">Sound</label>
+                        <div className="flex items-center gap-4 w-2/3">
                             <input
                                 id="sound-volume"
                                 type="range"
@@ -111,15 +113,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 onChange={(e) => onSetSoundVolume(Number(e.target.value))}
                                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb flex-grow"
                             />
-                            <button onClick={onToggleSound} className={`text-sm font-bold w-16 text-center border-2 rounded-md py-1 transition-colors ${soundEnabled ? 'bg-cyan-500 text-black border-cyan-500' : 'text-gray-400 border-slate-600'}`}>
+                            <button onClick={onToggleSound} className={`text-sm font-bold w-16 text-center border-2 rounded-md py-1 transition-colors flex-shrink-0 ${soundEnabled ? 'bg-cyan-500 text-black border-cyan-500' : 'text-gray-400 border-slate-600'}`}>
                                 {soundEnabled ? 'ON' : 'OFF'}
                             </button>
                         </div>
                     </div>
 
-                    <div>
-                        <label htmlFor="music-volume" className="font-semibold text-lg mb-2 block">Music</label>
-                        <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between gap-4">
+                        <label htmlFor="music-volume" className="font-semibold text-lg flex-shrink-0">Music</label>
+                        <div className="flex items-center gap-4 w-2/3">
                              <input
                                 id="music-volume"
                                 type="range"
@@ -130,7 +132,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 onChange={(e) => onSetMusicVolume(Number(e.target.value))}
                                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb flex-grow"
                             />
-                            <button onClick={onToggleMusic} className={`text-sm font-bold w-16 text-center border-2 rounded-md py-1 transition-colors ${musicEnabled ? 'bg-cyan-500 text-black border-cyan-500' : 'text-gray-400 border-slate-600'}`}>
+                            <button onClick={onToggleMusic} className={`text-sm font-bold w-16 text-center border-2 rounded-md py-1 transition-colors flex-shrink-0 ${musicEnabled ? 'bg-cyan-500 text-black border-cyan-500' : 'text-gray-400 border-slate-600'}`}>
                                 {musicEnabled ? 'ON' : 'OFF'}
                             </button>
                         </div>
@@ -147,26 +149,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     )}
                 </div>
 
-                {context === 'game' && (
-                    <div className="mt-8 grid grid-cols-2 gap-4">
+                {context === 'game' && onGoToShop && onGoToInventory && (
+                    <div className="mt-6 grid grid-cols-2 gap-4">
                         <button
                             onClick={onGoToShop}
-                            className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold text-base hover:bg-purple-500 transition-colors"
+                            className="w-full bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center space-x-2 py-3 font-bold text-base hover:from-purple-500 transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
-                            Shop
+                            <ShopIcon className="h-6 w-6" /><span>Shop</span>
                         </button>
                         <button
                             onClick={onGoToInventory}
-                            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-base hover:bg-indigo-500 transition-colors"
+                            className="w-full bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center space-x-2 py-3 font-bold text-base hover:from-teal-400 transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
-                            Inventory
+                            <InventoryIcon className="h-6 w-6" /><span>Inventory</span>
                         </button>
                     </div>
                 )}
 
                 <button
                     onClick={onClose}
-                    className="w-full mt-6 bg-slate-700 text-slate-200 py-3 rounded-lg font-bold text-base hover:bg-slate-600 transition-colors"
+                    className={`w-full ${context === 'game' ? 'mt-4' : 'mt-8'} bg-slate-700 text-slate-200 py-3 rounded-lg font-bold text-base hover:bg-slate-600 transition-colors`}
                 >
                     Close
                 </button>

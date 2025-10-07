@@ -17,8 +17,67 @@ import { audioService } from './services/audioService';
 type GameView = 'menu' | 'game' | 'shop' | 'inventory';
 type AIDifficulty = 'easy' | 'medium' | 'hard';
 
-// --- First Move Animation Component ---
+// --- Persisted Data Logic ---
+interface SavedPlayerData {
+    playerName: string;
+    playerXP: number;
+    playerCoins: number;
+    wins: number;
+    losses: number;
+    ownedSkins: string[];
+    equippedSkin: string;
+    ownedAvatars: string[];
+    equippedAvatar: string;
+    ownedThemes: string[];
+    equippedTheme: string;
+    ownedEmojis: string[];
+    soundEnabled: boolean;
+    musicEnabled: boolean;
+    musicTrack: string;
+    soundVolume: number;
+    musicVolume: number;
+    gameDuration: number;
+    turnDuration: number;
+}
 
+const getInitialState = (): SavedPlayerData => {
+    const defaultState: SavedPlayerData = {
+        playerName: 'Player_5566',
+        playerXP: 55,
+        playerCoins: 9960,
+        wins: 0,
+        losses: 0,
+        ownedSkins: ['default', 'inkwash'],
+        equippedSkin: 'default',
+        ownedAvatars: ['player1'],
+        equippedAvatar: 'player1',
+        ownedThemes: ['default'],
+        equippedTheme: 'default',
+        ownedEmojis: ['e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8'],
+        soundEnabled: true,
+        musicEnabled: true,
+        musicTrack: MUSIC_TRACKS[0].src,
+        soundVolume: 1,
+        musicVolume: 0.5,
+        gameDuration: DEFAULT_GAME_TIME_SECONDS,
+        turnDuration: TURN_DURATION_SECONDS,
+    };
+
+    try {
+        const savedDataString = localStorage.getItem('chessAiArenaData');
+        if (savedDataString) {
+            const savedData = JSON.parse(savedDataString);
+            return { ...defaultState, ...savedData };
+        }
+    } catch (error) {
+        console.error("Failed to load data from localStorage", error);
+    }
+
+    return defaultState;
+};
+
+
+// --- First Move Animation Component ---
 const redGeneral: Piece = { id: -1, player: Player.Red, type: PieceType.General, position: { x: 4, y: 4.5 } };
 const blackGeneral: Piece = { id: -2, player: Player.Black, type: PieceType.General, position: { x: 4, y: 4.5 } };
 
@@ -32,6 +91,7 @@ const FirstMoveAnimation: React.FC<FirstMoveAnimationProps> = ({ onAnimationEnd,
     const firstPlayer = useMemo(() => Math.random() < 0.5 ? Player.Red : Player.Black, []);
 
     useEffect(() => {
+        audioService.playDecidingSound();
         const timer = setTimeout(() => {
             setWinner(firstPlayer);
              if (firstPlayer === Player.Red) {
@@ -85,6 +145,8 @@ const FirstMoveAnimation: React.FC<FirstMoveAnimationProps> = ({ onAnimationEnd,
 
 
 const App: React.FC = () => {
+    const [initialState] = useState(getInitialState);
+    
     const [view, setView] = useState<GameView>('menu');
     const [previousView, setPreviousView] = useState<GameView | null>(null);
     const [pieces, setPieces] = useState<Piece[]>(INITIAL_PIECES);
@@ -97,22 +159,22 @@ const App: React.FC = () => {
     const [moveHistory, setMoveHistory] = useState<Piece[][]>([JSON.parse(JSON.stringify(INITIAL_PIECES))]);
     const [hintMove, setHintMove] = useState<Move | null>(null);
     const [aiThinkingMove, setAiThinkingMove] = useState<Move | null>(null);
-    const [aiDifficulty, setAiDifficulty] = useState<AIDifficulty>('easy');
     const [currentOpponent, setCurrentOpponent] = useState<AIOpponent | null>(AI_OPPONENTS[0]);
+    const [aiDifficulty, setAiDifficulty] = useState<AIDifficulty>('easy');
 
     // Player Stats & Customization
-    const [playerName, setPlayerName] = useState('Player_5566');
-    const [playerXP, setPlayerXP] = useState(55);
-    const [playerCoins, setPlayerCoins] = useState(9960);
-    const [wins, setWins] = useState(0);
-    const [losses, setLosses] = useState(11);
-    const [ownedSkins, setOwnedSkins] = useState<string[]>(['default', 'inkwash']);
-    const [equippedSkin, setEquippedSkin] = useState<string>('default');
-    const [ownedAvatars, setOwnedAvatars] = useState<string[]>(['player1']);
-    const [equippedAvatar, setEquippedAvatar] = useState<string>('player1');
-    const [ownedThemes, setOwnedThemes] = useState<string[]>(['default']);
-    const [equippedTheme, setEquippedTheme] = useState<string>('default');
-    const [ownedEmojis, setOwnedEmojis] = useState<string[]>(['e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8']);
+    const [playerName, setPlayerName] = useState(initialState.playerName);
+    const [playerXP, setPlayerXP] = useState(initialState.playerXP);
+    const [playerCoins, setPlayerCoins] = useState(initialState.playerCoins);
+    const [wins, setWins] = useState(initialState.wins);
+    const [losses, setLosses] = useState(initialState.losses);
+    const [ownedSkins, setOwnedSkins] = useState(initialState.ownedSkins);
+    const [equippedSkin, setEquippedSkin] = useState(initialState.equippedSkin);
+    const [ownedAvatars, setOwnedAvatars] = useState(initialState.ownedAvatars);
+    const [equippedAvatar, setEquippedAvatar] = useState(initialState.equippedAvatar);
+    const [ownedThemes, setOwnedThemes] = useState(initialState.ownedThemes);
+    const [equippedTheme, setEquippedTheme] = useState(initialState.equippedTheme);
+    const [ownedEmojis, setOwnedEmojis] = useState(initialState.ownedEmojis);
 
 
     // Modals, Popups & Timers
@@ -123,18 +185,41 @@ const App: React.FC = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [showResignConfirm, setShowResignConfirm] = useState(false);
     const [animatingEmoji, setAnimatingEmoji] = useState<{emoji: string, from: 'player' | 'ai'} | null>(null);
-    const [gameDuration, setGameDuration] = useState(DEFAULT_GAME_TIME_SECONDS);
-    const [turnDuration, setTurnDuration] = useState(TURN_DURATION_SECONDS);
+    const [gameDuration, setGameDuration] = useState(initialState.gameDuration);
+    const [turnDuration, setTurnDuration] = useState(initialState.turnDuration);
     const [gameTimer, setGameTimer] = useState(gameDuration);
     const [turnTimer, setTurnTimer] = useState(turnDuration);
     const [lastGameResult, setLastGameResult] = useState({ xpGained: 0, coinsGained: 0, initialXP: 0 });
     
     // Settings State
-    const [soundEnabled, setSoundEnabled] = useState(true);
-    const [musicEnabled, setMusicEnabled] = useState(true);
-    const [musicTrack, setMusicTrack] = useState(MUSIC_TRACKS[0].src);
-    const [soundVolume, setSoundVolume] = useState(1);
-    const [musicVolume, setMusicVolume] = useState(0.5);
+    const [soundEnabled, setSoundEnabled] = useState(initialState.soundEnabled);
+    const [musicEnabled, setMusicEnabled] = useState(initialState.musicEnabled);
+    const [musicTrack, setMusicTrack] = useState(initialState.musicTrack);
+    const [soundVolume, setSoundVolume] = useState(initialState.soundVolume);
+    const [musicVolume, setMusicVolume] = useState(initialState.musicVolume);
+
+    // Save state to localStorage on change
+    useEffect(() => {
+        const dataToSave: SavedPlayerData = {
+            playerName, playerXP, playerCoins, wins, losses,
+            ownedSkins, equippedSkin, ownedAvatars, equippedAvatar,
+            ownedThemes, equippedTheme, ownedEmojis,
+            soundEnabled, musicEnabled, musicTrack, soundVolume, musicVolume,
+            gameDuration, turnDuration,
+        };
+
+        try {
+            localStorage.setItem('chessAiArenaData', JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error("Failed to save data to localStorage", error);
+        }
+    }, [
+        playerName, playerXP, playerCoins, wins, losses,
+        ownedSkins, equippedSkin, ownedAvatars, equippedAvatar,
+        ownedThemes, equippedTheme, ownedEmojis,
+        soundEnabled, musicEnabled, musicTrack, soundVolume, musicVolume,
+        gameDuration, turnDuration
+    ]);
 
     // Audio Effects
     useEffect(() => { audioService.setSoundEnabled(soundEnabled); }, [soundEnabled]);
@@ -373,8 +458,13 @@ const App: React.FC = () => {
         setPieces(stateBeforePlayerMove);
         setMoveHistory(hist => hist.slice(0, -2));
         
+        const isNowInCheck = isCheck(stateBeforePlayerMove, Player.Red);
+        if (isNowInCheck) {
+            audioService.playCheckSound();
+        }
+
         setCurrentPlayer(Player.Red);
-        setGameState(isCheck(stateBeforePlayerMove, Player.Red) ? 'check' : 'playing');
+        setGameState(isNowInCheck ? 'check' : 'playing');
         setSelectedPiece(null);
         setValidMoves([]);
         setLastMove(null);
@@ -604,6 +694,16 @@ const App: React.FC = () => {
                                     </h2>
                                 </div>
                             )}
+                            {showEndGameModal && winner && (
+                                <EndGameModal 
+                                    winner={winner} 
+                                    onPlayAgain={handleReset}
+                                    onLeaveRoom={handleBack}
+                                    initialXP={lastGameResult.initialXP}
+                                    xpGained={lastGameResult.xpGained}
+                                    coinsGained={lastGameResult.coinsGained}
+                                />
+                            )}
                         </div>
 
                         <div className="w-full max-w-sm md:max-w-md mx-auto mt-2 grid grid-cols-2 gap-2 h-20">
@@ -633,16 +733,6 @@ const App: React.FC = () => {
                             </div>
                         )}
                        
-                        {showEndGameModal && winner && (
-                            <EndGameModal 
-                                winner={winner} 
-                                onPlayAgain={handleReset}
-                                onLeaveRoom={handleBack}
-                                initialXP={lastGameResult.initialXP}
-                                xpGained={lastGameResult.xpGained}
-                                coinsGained={lastGameResult.coinsGained}
-                            />
-                        )}
                          {showResignConfirm && (
                             <ConfirmModal
                                 title="Resign Game"
@@ -708,12 +798,12 @@ const App: React.FC = () => {
                         setIsSettingsOpen(false);
                     }}
                     onGoToShop={() => {
-                        setIsSettingsOpen(false);
                         handleNavigate('shop');
+                        setIsSettingsOpen(false);
                     }}
                     onGoToInventory={() => {
-                        setIsSettingsOpen(false);
                         handleNavigate('inventory');
+                        setIsSettingsOpen(false);
                     }}
                 />
             )}

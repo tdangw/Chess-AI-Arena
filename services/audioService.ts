@@ -11,6 +11,7 @@ interface AudioSources {
   check: HTMLAudioElement | null;
   firstMovePlayer: HTMLAudioElement | null;
   firstMoveAI: HTMLAudioElement | null;
+  deciding: HTMLAudioElement | null;
 }
 
 class AudioService {
@@ -27,6 +28,7 @@ class AudioService {
     check: null,
     firstMovePlayer: null,
     firstMoveAI: null,
+    deciding: null,
   };
 
   private soundEnabled = true;
@@ -34,6 +36,7 @@ class AudioService {
   private soundVolume = 0.5; // Represents 100% of the sound volume slider
   private musicVolume = 0.5; // Represents 100% of the music volume slider
   private hasInteracted = false;
+  private wasMusicPlayingBeforeHidden = false;
 
   constructor() {
     const init = () => {
@@ -43,7 +46,21 @@ class AudioService {
     };
     document.body.addEventListener('click', init, { once: true });
     document.body.addEventListener('touchend', init, { once: true });
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
+
+  private handleVisibilityChange = () => {
+    if (!this.hasInteracted) return;
+    if (document.hidden) {
+      this.wasMusicPlayingBeforeHidden =
+        this.musicEnabled && !!this.sources.music && !this.sources.music.paused;
+      this.pauseMusic();
+    } else {
+      if (this.wasMusicPlayingBeforeHidden) {
+        this.playMusic();
+      }
+    }
+  };
 
   private initializeAudio() {
     if (typeof Audio === 'undefined') {
@@ -67,6 +84,7 @@ class AudioService {
     this.sources.click = new Audio('assets/sounds/click.mp3');
     this.sources.select = new Audio('assets/sounds/select.mp3');
     this.sources.check = new Audio('assets/sounds/check.mp3');
+    this.sources.deciding = new Audio('assets/sounds/deciding.mp3');
     this.sources.firstMovePlayer = new Audio(
       'assets/sounds/first_move_player.mp3'
     );
@@ -175,6 +193,7 @@ class AudioService {
   public playClickSound = () => this.playSound(this.sources.click);
   public playSelectSound = () => this.playSound(this.sources.select);
   public playCheckSound = () => this.playSound(this.sources.check);
+  public playDecidingSound = () => this.playSound(this.sources.deciding);
   public playFirstMovePlayerSound = () =>
     this.playSound(this.sources.firstMovePlayer);
   public playFirstMoveAISound = () => this.playSound(this.sources.firstMoveAI);

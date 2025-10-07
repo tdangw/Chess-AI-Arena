@@ -58,9 +58,9 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
     const barWidth = (currentLevelXP / MAX_XP_PER_LEVEL) * 100;
 
     return (
-        <div className="absolute inset-0 bg-black/70 flex items-start justify-center pt-16 z-50 font-sans">
-            <div className="bg-[#1E293B] w-full max-w-sm rounded-2xl p-8 text-center text-white border-2 border-gray-700 shadow-lg animate-fade-in-up">
-                <h1 className={`text-6xl font-extrabold mb-4 ${isPlayerWinner ? 'text-green-400' : 'text-red-500'}`}>
+        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans p-4">
+            <div className="bg-[#1E293B] w-full max-w-xs rounded-2xl p-6 text-center text-white border-2 border-gray-700 shadow-lg animate-fade-in-up">
+                <h1 className={`text-5xl font-extrabold mb-4 ${isPlayerWinner ? 'text-green-400' : 'text-red-500'}`}>
                     {isPlayerWinner ? 'YOU WIN!' : 'YOU LOSE!'}
                 </h1>
 
@@ -79,8 +79,8 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
                         <div className="flex flex-col items-center">
                             <p className="text-lg font-bold text-yellow-400">REWARDS</p>
                             <div className="flex items-center mt-1 space-x-4">
-                                <span className="text-2xl font-bold flex items-center"><CoinIcon /> +{coinsGained}</span>
-                                <span className="text-2xl font-bold text-cyan-400">✨ +{xpGained} XP</span>
+                                <span className="text-xl font-bold flex items-center"><CoinIcon /> +{coinsGained}</span>
+                                <span className="text-xl font-bold text-cyan-400">✨ +{xpGained} XP</span>
                             </div>
                         </div>
                     </div>
@@ -88,13 +88,13 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
 
                 <button 
                     onClick={onPlayAgain}
-                    className="w-full bg-green-500 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-400 transition-colors mb-4"
+                    className="w-full bg-green-500 text-white py-2 rounded-lg font-bold text-base hover:bg-green-400 transition-colors mb-3"
                 >
                     Play again!
                 </button>
                 <button 
                     onClick={onLeaveRoom}
-                    className="w-full bg-gray-700 text-gray-300 py-3 rounded-lg font-bold text-lg hover:bg-gray-600 transition-colors"
+                    className="w-full bg-gray-700 text-gray-300 py-2 rounded-lg font-bold text-base hover:bg-gray-600 transition-colors"
                 >
                     Leave room ({countdown})
                 </button>
