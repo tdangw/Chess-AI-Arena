@@ -183,7 +183,7 @@ const Board: React.FC<BoardProps> = ({ pieces, selectedPiece, validMoves, lastMo
             <div className={riverTextClasses}>
                  <div className="flex items-baseline justify-center space-x-2 whitespace-nowrap">
                     <span>CỜ TƯỚNG AI ARENA</span>
-                    <span className="text-xs font-sans font-normal tracking-normal opacity-70">by tdangw</span>
+                    <span className="text-xs font-sans font-normal tracking-normal opacity-70">bởi tdangw</span>
                 </div>
             </div>
           

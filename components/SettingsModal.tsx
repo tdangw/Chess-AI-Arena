@@ -39,15 +39,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     onGoToInventory
 }) => {
     const gameDurations = [
-        { label: '10 Min', value: 600 },
-        { label: '15 Min', value: 900 },
-        { label: '30 Min', value: 1800 },
-        { label: '45 Min', value: 2700 },
+        { label: '10 Phút', value: 600 },
+        { label: '15 Phút', value: 900 },
+        { label: '30 Phút', value: 1800 },
+        { label: '45 Phút', value: 2700 },
     ];
     const turnDurations = [
-        { label: '1 Min', value: 60 },
-        { label: '3 Min', value: 180 },
-        { label: '5 Min', value: 300 },
+        { label: '1 Phút', value: 60 },
+        { label: '3 Phút', value: 180 },
+        { label: '5 Phút', value: 300 },
     ];
 
     const renderSelect = (id: string, label: string, value: string | number, onChange: (val: any) => void, options: {label: string, value: string | number}[]) => (
@@ -97,11 +97,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
                     <CloseIcon />
                 </button>
-                <h2 className="text-3xl font-bold mb-6 text-center text-cyan-400">Settings</h2>
+                <h2 className="text-3xl font-bold mb-6 text-center text-cyan-400">Cài Đặt</h2>
 
                 <div className="space-y-5">
                     <div className="flex items-center justify-between gap-4">
-                        <label htmlFor="sound-volume" className="font-semibold text-lg flex-shrink-0">Sound</label>
+                        <label htmlFor="sound-volume" className="font-semibold text-lg flex-shrink-0">Âm thanh</label>
                         <div className="flex items-center gap-4 w-2/3">
                             <input
                                 id="sound-volume"
@@ -114,13 +114,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb flex-grow"
                             />
                             <button onClick={onToggleSound} className={`text-sm font-bold w-16 text-center border-2 rounded-md py-1 transition-colors flex-shrink-0 ${soundEnabled ? 'bg-cyan-500 text-black border-cyan-500' : 'text-gray-400 border-slate-600'}`}>
-                                {soundEnabled ? 'ON' : 'OFF'}
+                                {soundEnabled ? 'BẬT' : 'TẮT'}
                             </button>
                         </div>
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                        <label htmlFor="music-volume" className="font-semibold text-lg flex-shrink-0">Music</label>
+                        <label htmlFor="music-volume" className="font-semibold text-lg flex-shrink-0">Nhạc nền</label>
                         <div className="flex items-center gap-4 w-2/3">
                              <input
                                 id="music-volume"
@@ -133,18 +133,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb flex-grow"
                             />
                             <button onClick={onToggleMusic} className={`text-sm font-bold w-16 text-center border-2 rounded-md py-1 transition-colors flex-shrink-0 ${musicEnabled ? 'bg-cyan-500 text-black border-cyan-500' : 'text-gray-400 border-slate-600'}`}>
-                                {musicEnabled ? 'ON' : 'OFF'}
+                                {musicEnabled ? 'BẬT' : 'TẮT'}
                             </button>
                         </div>
                     </div>
                     
                     <div className="pt-2">
-                       {renderSelect('music-select', 'Select Music', selectedTrack, (val) => onSelectTrack(val), MUSIC_TRACKS.map(track => ({label: track.name, value: track.src})))}
+                       {renderSelect('music-select', 'Chọn Nhạc', selectedTrack, (val) => onSelectTrack(val), MUSIC_TRACKS.map(track => ({label: track.name, value: track.src})))}
                     </div>
                     {context === 'menu' && (
                          <div className="pt-2 grid grid-cols-2 gap-4">
-                            {renderSelect('duration-select', 'Game Time', gameDuration, (v) => onSetGameDuration(Number(v)), gameDurations)}
-                            {renderSelect('turn-duration-select', 'Turn Time', turnDuration, (v) => onSetTurnDuration(Number(v)), turnDurations)}
+                            {renderSelect('duration-select', 'Thời Gian Ván Đấu', gameDuration, (v) => onSetGameDuration(Number(v)), gameDurations)}
+                            {renderSelect('turn-duration-select', 'Thời Gian Lượt Đi', turnDuration, (v) => onSetTurnDuration(Number(v)), turnDurations)}
                         </div>
                     )}
                 </div>
@@ -155,13 +155,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                             onClick={onGoToShop}
                             className="w-full bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center space-x-2 py-3 font-bold text-base hover:from-purple-500 transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
-                            <ShopIcon className="h-6 w-6" /><span>Shop</span>
+                            <ShopIcon className="h-6 w-6" /><span>Cửa Hàng</span>
                         </button>
                         <button
                             onClick={onGoToInventory}
                             className="w-full bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center space-x-2 py-3 font-bold text-base hover:from-teal-400 transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
-                            <InventoryIcon className="h-6 w-6" /><span>Inventory</span>
+                            <InventoryIcon className="h-6 w-6" /><span>Kho Đồ</span>
                         </button>
                     </div>
                 )}
@@ -170,7 +170,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={onClose}
                     className={`w-full ${context === 'game' ? 'mt-4' : 'mt-8'} bg-slate-700 text-slate-200 py-3 rounded-lg font-bold text-base hover:bg-slate-600 transition-colors`}
                 >
-                    Close
+                    Đóng
                 </button>
             </div>
              <style>{`

@@ -131,7 +131,7 @@ const FirstMoveAnimation: React.FC<FirstMoveAnimationProps> = ({ onAnimationEnd,
                 </div>
             </div>
             <p className="text-white font-semibold text-xl mt-4 transition-opacity duration-300">
-                {winner ? `${winner === Player.Red ? 'You go' : 'AI goes'} first!` : 'Deciding who goes first...'}
+                {winner ? `${winner === Player.Red ? 'Bạn đi' : 'AI đi'} trước!` : 'Đang quyết định ai đi trước...'}
             </p>
             <style>{`
                 @keyframes slide-in-left { 0% { transform: translateX(-100vw); } 80% { transform: translateX(0); } 100% { transform: translateX(0); }}
@@ -152,9 +152,9 @@ const EntryScreen: React.FC<EntryScreenProps> = ({ onEnter }) => {
   return (
     <div className="absolute inset-0 bg-[#0F172A] flex flex-col items-center justify-center z-[100] font-sans">
         <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 text-center">
-            Chess AI Arena
+            Cờ Tướng AI Arena
         </h1>
-        <p className="text-gray-400 mt-2 text-lg text-center">A battle of wits across the river.</p>
+        <p className="text-gray-400 mt-2 text-lg text-center">Một trận chiến trí tuệ bên kia sông.</p>
         <button 
             onClick={onEnter} 
             className="mt-12 text-2xl font-bold bg-cyan-500 text-black py-4 px-10 rounded-lg transition-transform hover:scale-105 animate-pulse shadow-lg shadow-cyan-500/30"
@@ -701,15 +701,15 @@ const App: React.FC = () => {
                                             <div className="absolute w-full max-w-md h-32 bg-gradient-to-r from-transparent via-yellow-900/50 to-transparent animate-banner-in">
                                                 <div className="absolute inset-0 bg-repeat bg-center opacity-10" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23fbbf24\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'}}></div>
                                             </div>
-                                            <h1 className="text-6xl md:text-7xl font-extrabold text-yellow-300 animate-win-text">
-                                                YOU WIN!
+                                            <h1 className="text-5xl md:text-6xl font-extrabold text-yellow-300 animate-win-text">
+                                                BẠN THẮNG!
                                             </h1>
                                         </>
                                     )}
                                     {showEndGameAnimation === 'lose' && (
                                         <div className="bg-slate-900/90 border-2 border-red-500 rounded-lg p-6 shadow-2xl animate-lose-popup">
-                                            <h1 className="text-5xl md:text-6xl font-extrabold text-red-500" style={{textShadow: '0 0 10px #000'}}>
-                                                YOU LOSE!
+                                            <h1 className="text-4xl md:text-5xl font-extrabold text-red-500" style={{textShadow: '0 0 10px #000'}}>
+                                                BẠN THUA!
                                             </h1>
                                         </div>
                                     )}
@@ -763,8 +763,8 @@ const App: React.FC = () => {
                        
                          {showResignConfirm && (
                             <ConfirmModal
-                                title="Resign Game"
-                                message="Are you sure you want to resign? This will count as a loss."
+                                title="Đầu Hàng"
+                                message="Bạn có chắc muốn đầu hàng không? Điều này sẽ được tính là một trận thua."
                                 onConfirm={confirmResign}
                                 onCancel={() => {
                                     audioService.playClickSound();

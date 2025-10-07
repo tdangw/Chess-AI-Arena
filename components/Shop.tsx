@@ -140,7 +140,7 @@ const Shop: React.FC<ShopProps> = ({ playerCoins, ownedSkins, ownedAvatars, owne
             <div className="w-full max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <div className="flex items-center space-x-4">
-                         <h1 className="text-5xl font-bold">Shop</h1>
+                         <h1 className="text-5xl font-bold">Cửa Hàng</h1>
                         <div className="flex items-center bg-gray-800 px-4 py-2 rounded-lg text-yellow-400 font-bold text-xl">
                             <CoinIcon />
                             <span className="ml-2">{playerCoins}</span>
@@ -148,16 +148,16 @@ const Shop: React.FC<ShopProps> = ({ playerCoins, ownedSkins, ownedAvatars, owne
                     </div>
                     <button onClick={onBack} className="bg-gray-700 px-4 py-2 rounded-lg font-semibold flex items-center space-x-2 hover:bg-gray-600">
                         <BackIcon />
-                        <span>Back</span>
+                        <span>Quay lại</span>
                     </button>
                 </div>
 
                 <div className="mb-8">
                     <div className="flex space-x-6 border-b-2 border-gray-700">
-                        <TabButton active={activeTab === 'skins'} onClick={() => setActiveTab('skins')}>Skins</TabButton>
-                        <TabButton active={activeTab === 'avatars'} onClick={() => setActiveTab('avatars')}>Avatars</TabButton>
-                        <TabButton active={activeTab === 'themes'} onClick={() => setActiveTab('themes')}>Themes</TabButton>
-                        <TabButton active={activeTab === 'emojis'} onClick={() => setActiveTab('emojis')}>Emojis</TabButton>
+                        <TabButton active={activeTab === 'skins'} onClick={() => setActiveTab('skins')}>Giao diện</TabButton>
+                        <TabButton active={activeTab === 'avatars'} onClick={() => setActiveTab('avatars')}>Ảnh đại diện</TabButton>
+                        <TabButton active={activeTab === 'themes'} onClick={() => setActiveTab('themes')}>Chủ đề</TabButton>
+                        <TabButton active={activeTab === 'emojis'} onClick={() => setActiveTab('emojis')}>Biểu cảm</TabButton>
                     </div>
                 </div>
 
@@ -172,7 +172,7 @@ const Shop: React.FC<ShopProps> = ({ playerCoins, ownedSkins, ownedAvatars, owne
 
 const PurchaseButton: React.FC<{isOwned: boolean, canAfford: boolean, price: number, onClick: () => void}> = ({ isOwned, canAfford, price, onClick}) => {
     if (isOwned) {
-        return <button disabled className="w-full bg-green-600 text-white py-2 rounded-lg font-bold cursor-not-allowed">Owned</button>;
+        return <button disabled className="w-full bg-green-600 text-white py-2 rounded-lg font-bold cursor-not-allowed">Đã sở hữu</button>;
     }
     return (
         <button 

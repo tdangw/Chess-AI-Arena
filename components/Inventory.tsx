@@ -122,19 +122,19 @@ const Inventory: React.FC<InventoryProps> = ({ ownedSkins, equippedSkin, ownedAv
         <div className="min-h-screen bg-[#0F172A] text-white p-8 font-sans">
             <div className="w-full max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-5xl font-bold">Inventory</h1>
+                    <h1 className="text-5xl font-bold">Kho Đồ</h1>
                     <button onClick={onBack} className="bg-gray-700 px-4 py-2 rounded-lg font-semibold flex items-center space-x-2 hover:bg-gray-600">
                         <BackIcon />
-                        <span>Back</span>
+                        <span>Quay lại</span>
                     </button>
                 </div>
 
                 <div className="mb-8">
                     <div className="flex space-x-6 border-b-2 border-gray-700">
-                         <TabButton active={activeTab === 'skins'} onClick={() => setActiveTab('skins')}>Skins</TabButton>
-                        <TabButton active={activeTab === 'avatars'} onClick={() => setActiveTab('avatars')}>Avatars</TabButton>
-                        <TabButton active={activeTab === 'themes'} onClick={() => setActiveTab('themes')}>Themes</TabButton>
-                        <TabButton active={activeTab === 'emojis'} onClick={() => setActiveTab('emojis')}>Emojis</TabButton>
+                         <TabButton active={activeTab === 'skins'} onClick={() => setActiveTab('skins')}>Giao diện</TabButton>
+                        <TabButton active={activeTab === 'avatars'} onClick={() => setActiveTab('avatars')}>Ảnh đại diện</TabButton>
+                        <TabButton active={activeTab === 'themes'} onClick={() => setActiveTab('themes')}>Chủ đề</TabButton>
+                        <TabButton active={activeTab === 'emojis'} onClick={() => setActiveTab('emojis')}>Biểu cảm</TabButton>
                     </div>
                 </div>
 
@@ -163,7 +163,7 @@ const InventoryCard: React.FC<{name: string, isEquipped: boolean, onEquip: () =>
                 : 'bg-gray-600 text-white hover:bg-gray-500'
             }`}
         >
-            {isEquipped ? 'Equipped' : 'Equip'}
+            {isEquipped ? 'Đã trang bị' : 'Trang bị'}
         </button>
     </div>
 );

@@ -60,12 +60,12 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
     return (
         <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans p-4">
             <div className="bg-[#1E293B] w-full max-w-xs rounded-2xl p-6 text-center text-white border-2 border-gray-700 shadow-lg animate-fade-in-up">
-                <h1 className={`text-5xl font-extrabold mb-4 ${isPlayerWinner ? 'text-green-400' : 'text-red-500'}`}>
-                    {isPlayerWinner ? 'YOU WIN!' : 'YOU LOSE!'}
+                <h1 className={`text-4xl font-extrabold mb-4 ${isPlayerWinner ? 'text-green-400' : 'text-red-500'}`}>
+                    {isPlayerWinner ? 'BẠN THẮNG!' : 'BẠN THUA!'}
                 </h1>
 
                 <div className="bg-slate-800/50 p-4 rounded-lg mb-6">
-                    <p className="text-sm text-gray-400">Level {playerLevel}</p>
+                    <p className="text-sm text-gray-400">Cấp {playerLevel}</p>
                     <div className="w-full bg-gray-900 rounded-full h-4 my-2 border border-gray-700 relative overflow-hidden">
                         <div 
                             className="absolute left-0 top-0 h-full bg-cyan-500 rounded-full"
@@ -77,7 +77,7 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
                     </div>
                     <div className="flex justify-center mt-4">
                         <div className="flex flex-col items-center">
-                            <p className="text-lg font-bold text-yellow-400">REWARDS</p>
+                            <p className="text-lg font-bold text-yellow-400">PHẦN THƯỞNG</p>
                             <div className="flex items-center mt-1 space-x-4">
                                 <span className="text-xl font-bold flex items-center"><CoinIcon /> +{coinsGained}</span>
                                 <span className="text-xl font-bold text-cyan-400">✨ +{xpGained} XP</span>
@@ -90,13 +90,13 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ winner, onPlayAgain, onLeav
                     onClick={onPlayAgain}
                     className="w-full bg-green-500 text-white py-2 rounded-lg font-bold text-base hover:bg-green-400 transition-colors mb-3"
                 >
-                    Play again!
+                    Chơi lại!
                 </button>
                 <button 
                     onClick={onLeaveRoom}
                     className="w-full bg-gray-700 text-gray-300 py-2 rounded-lg font-bold text-base hover:bg-gray-600 transition-colors"
                 >
-                    Leave room ({countdown})
+                    Rời phòng ({countdown})
                 </button>
             </div>
              <style>{`

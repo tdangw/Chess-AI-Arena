@@ -57,14 +57,14 @@ const GameHeader: React.FC<GameHeaderProps> = ({
     return (
         <div className="w-full max-w-sm md:max-w-md text-white font-sans z-20">
             <div className="relative flex justify-center items-center mb-2 sm:mb-4 space-x-2 sm:space-x-4 md:space-x-6">
-                <button onClick={onOpenSettings} className="text-gray-400 hover:text-white" title="Settings"><SettingsIcon /></button>
-                <button onClick={onUndo} className="text-gray-400 hover:text-white" title="Undo"><UndoIcon /></button>
-                <button onClick={onHint} className="text-gray-400 hover:text-white" title="Hint"><HintIcon /></button>
+                <button onClick={onOpenSettings} className="text-gray-400 hover:text-white" title="Cài đặt"><SettingsIcon /></button>
+                <button onClick={onUndo} className="text-gray-400 hover:text-white" title="Hoàn tác"><UndoIcon /></button>
+                <button onClick={onHint} className="text-gray-400 hover:text-white" title="Gợi ý"><HintIcon /></button>
                 <div className="relative">
-                    <button onClick={() => setIsPickerVisible(p => !p)} className="text-gray-400 hover:text-white" title="Emoji"><EmojiIcon /></button>
+                    <button onClick={() => setIsPickerVisible(p => !p)} className="text-gray-400 hover:text-white" title="Biểu cảm"><EmojiIcon /></button>
                      {isPickerVisible && <EmojiPicker onSelect={handleEmojiSelect} ownedEmojis={ownedEmojis} />}
                 </div>
-                <button onClick={onResign} className="text-gray-400 hover:text-white" title="Resign"><ResignIcon /></button>
+                <button onClick={onResign} className="text-gray-400 hover:text-white" title="Đầu hàng"><ResignIcon /></button>
             </div>
             <div className="flex flex-col justify-between items-center bg-[#1E293B]/80 p-2 sm:p-3 rounded-lg relative overflow-hidden">
                 <div className="w-full flex justify-between items-center">
@@ -73,13 +73,13 @@ const GameHeader: React.FC<GameHeaderProps> = ({
                         <img src={playerAvatarUrl} alt="Player 1" className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-blue-400 transition-all duration-300 ${playerGlow}`} />
                         <div>
                             <p className="font-bold text-[11px] sm:text-xs">{playerName}</p>
-                            <p className="text-[10px] sm:text-[11px] text-gray-400">Lv. 1</p>
+                            <p className="text-[10px] sm:text-[11px] text-gray-400">Cấp 1</p>
                         </div>
                     </div>
                     
                     {/* Score & Timer */}
                     <div className="text-center z-10">
-                        <p className="text-xs sm:text-sm">{`Win ${wins} - Lose ${losses}`}</p>
+                        <p className="text-xs sm:text-sm">{`Thắng ${wins} - Thua ${losses}`}</p>
                         <p className="text-xl sm:text-2xl font-bold">{formatTime(gameTimer)}</p>
                     </div>
 
@@ -87,7 +87,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
                     <div className="flex items-center space-x-2 z-10">
                          <div>
                             <p className="font-bold text-[11px] sm:text-xs text-right">{opponentName}</p>
-                            <p className="text-[10px] sm:text-[11px] text-gray-400 text-right">Lv. {opponentLevel} AI</p>
+                            <p className="text-[10px] sm:text-[11px] text-gray-400 text-right">Cấp {opponentLevel} AI</p>
                         </div>
                         <img src={opponentAvatarUrl} alt="Player 2" className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-pink-400 transition-all duration-300 ${aiGlow}`} />
                     </div>
