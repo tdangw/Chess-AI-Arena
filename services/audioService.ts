@@ -8,6 +8,7 @@ interface AudioSources {
   loseEffect: HTMLAudioElement | null;
   click: HTMLAudioElement | null;
   select: HTMLAudioElement | null;
+  check: HTMLAudioElement | null;
   firstMovePlayer: HTMLAudioElement | null;
   firstMoveAI: HTMLAudioElement | null;
 }
@@ -23,6 +24,7 @@ class AudioService {
     loseEffect: null,
     click: null,
     select: null,
+    check: null,
     firstMovePlayer: null,
     firstMoveAI: null,
   };
@@ -45,12 +47,12 @@ class AudioService {
 
   private initializeAudio() {
     if (typeof Audio === 'undefined') {
-        console.warn("Audio API not supported.");
-        return;
+      console.warn('Audio API not supported.');
+      return;
     }
     if (this.sources.music) return;
-    
-    console.log("Initializing audio sources...");
+
+    console.log('Initializing audio sources...');
 
     this.sources.music = new Audio('assets/sounds/music.mp3');
     this.sources.music.loop = true;
@@ -64,59 +66,62 @@ class AudioService {
     this.sources.loseEffect = new Audio('assets/sounds/lose.mp3');
     this.sources.click = new Audio('assets/sounds/click.mp3');
     this.sources.select = new Audio('assets/sounds/select.mp3');
-    this.sources.firstMovePlayer = new Audio('assets/sounds/first_move_player.mp3');
+    this.sources.check = new Audio('assets/sounds/check.mp3');
+    this.sources.firstMovePlayer = new Audio(
+      'assets/sounds/first_move_player.mp3'
+    );
     this.sources.firstMoveAI = new Audio('assets/sounds/first_move_ai.mp3');
-    
+
     Object.entries(this.sources).forEach(([key, source]) => {
-        if (source) {
-            if (key !== 'music') {
-                source.volume = this.soundVolume * 0.5; // SFX are 50% of the sound volume
-            }
-            source.load();
-            source.addEventListener('error', (e) => {
-                console.error(`Error loading audio source: ${source.src}`, e);
-            });
+      if (source) {
+        if (key !== 'music') {
+          source.volume = this.soundVolume * 0.5; // SFX are 50% of the sound volume
         }
+        source.load();
+        source.addEventListener('error', (e: Event) => {
+          console.error(`Error loading audio source: ${source.src}`, e);
+        });
+      }
     });
-    
+
     if (this.musicEnabled) {
-         this.playMusic();
+      this.playMusic();
     }
   }
 
   private playSound(sound: HTMLAudioElement | null) {
     if (!this.soundEnabled || !sound || !this.hasInteracted) {
-        return;
+      return;
     }
     sound.currentTime = 0;
     const playPromise = sound.play();
     if (playPromise !== undefined) {
-      playPromise.catch(error => {
+      playPromise.catch((error) => {
         // Ignore user not interacted error as we handle it with hasInteracted
         if (error.name !== 'NotAllowedError') {
-             console.error(`Error playing sound ${sound.src}:`, error);
+          console.error(`Error playing sound ${sound.src}:`, error);
         }
       });
     }
   }
 
   private playMusic() {
-      if (this.musicEnabled && this.sources.music && this.hasInteracted) {
-          const playPromise = this.sources.music.play();
-          if (playPromise !== undefined) {
-              playPromise.catch(error => {
-                   if (error.name !== 'NotAllowedError') {
-                        console.error("Error playing music:", error);
-                   }
-              });
+    if (this.musicEnabled && this.sources.music && this.hasInteracted) {
+      const playPromise = this.sources.music.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          if (error.name !== 'NotAllowedError') {
+            console.error('Error playing music:', error);
           }
+        });
       }
+    }
   }
 
   private pauseMusic() {
-      if (this.sources.music) {
-          this.sources.music.pause();
-      }
+    if (this.sources.music) {
+      this.sources.music.pause();
+    }
   }
 
   public setSoundEnabled(enabled: boolean) {
@@ -126,35 +131,35 @@ class AudioService {
   public setMusicEnabled(enabled: boolean) {
     this.musicEnabled = enabled;
     if (enabled) {
-        this.playMusic();
+      this.playMusic();
     } else {
-        this.pauseMusic();
+      this.pauseMusic();
     }
   }
 
   public setSoundVolume(volume: number) {
-      this.soundVolume = volume;
-      Object.entries(this.sources).forEach(([key, source]) => {
-          if (source && key !== 'music') {
-              source.volume = this.soundVolume * 0.5; // Keep SFX at 50% of the slider value
-          }
-      });
+    this.soundVolume = volume;
+    Object.entries(this.sources).forEach(([key, source]) => {
+      if (source && key !== 'music') {
+        source.volume = this.soundVolume * 0.5; // Keep SFX at 50% of the slider value
+      }
+    });
   }
 
   public setMusicVolume(volume: number) {
-      this.musicVolume = volume;
-      if (this.sources.music) {
-          this.sources.music.volume = this.musicVolume;
-      }
+    this.musicVolume = volume;
+    if (this.sources.music) {
+      this.sources.music.volume = this.musicVolume;
+    }
   }
-  
+
   public changeMusic(trackSrc: string) {
-      if (this.sources.music && this.hasInteracted) {
-          this.pauseMusic();
-          this.sources.music.src = trackSrc;
-          this.sources.music.load();
-          this.playMusic();
-      }
+    if (this.sources.music && this.hasInteracted) {
+      this.pauseMusic();
+      this.sources.music.src = trackSrc;
+      this.sources.music.load();
+      this.playMusic();
+    }
   }
 
   public playMoveSound = () => this.playSound(this.sources.move);
@@ -169,7 +174,9 @@ class AudioService {
   };
   public playClickSound = () => this.playSound(this.sources.click);
   public playSelectSound = () => this.playSound(this.sources.select);
-  public playFirstMovePlayerSound = () => this.playSound(this.sources.firstMovePlayer);
+  public playCheckSound = () => this.playSound(this.sources.check);
+  public playFirstMovePlayerSound = () =>
+    this.playSound(this.sources.firstMovePlayer);
   public playFirstMoveAISound = () => this.playSound(this.sources.firstMoveAI);
 }
 

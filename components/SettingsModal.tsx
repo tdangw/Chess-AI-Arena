@@ -20,7 +20,6 @@ interface SettingsModalProps {
     turnDuration: number;
     onSetTurnDuration: (duration: number) => void;
     onClose: () => void;
-    onResign: () => void;
     onGoToShop: () => void;
     onGoToInventory: () => void;
 }
@@ -35,7 +34,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     musicVolume, onSetMusicVolume,
     gameDuration, onSetGameDuration,
     turnDuration, onSetTurnDuration,
-    onClose, onResign, onGoToShop, onGoToInventory 
+    onClose, onGoToShop, onGoToInventory 
 }) => {
     const gameDurations = [
         { label: '10 Min', value: 600 },
@@ -71,22 +70,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
         </div>
     );
-    
-     const renderSlider = (id: string, label: string, value: number, onChange: (val: number) => void) => (
-        <div>
-            <label htmlFor={id} className="font-semibold text-base mb-2 block">{label}</label>
-            <input
-                id={id}
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={value}
-                onChange={(e) => onChange(Number(e.target.value))}
-                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb"
-            />
-        </div>
-    );
 
     return (
         <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50 font-sans">
@@ -114,22 +97,44 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 </button>
                 <h2 className="text-3xl font-bold mb-6 text-center text-cyan-400">Settings</h2>
 
-                <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <span className="font-semibold text-lg">Sound</span>
-                        <button onClick={onToggleSound} className="text-lg font-bold text-cyan-400 w-16 text-center">
-                            {soundEnabled ? 'ON' : 'OFF'}
-                        </button>
+                <div className="space-y-5">
+                    <div>
+                        <label htmlFor="sound-volume" className="font-semibold text-lg mb-2 block">Sound</label>
+                        <div className="flex items-center gap-4">
+                            <input
+                                id="sound-volume"
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.05"
+                                value={soundVolume}
+                                onChange={(e) => onSetSoundVolume(Number(e.target.value))}
+                                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb flex-grow"
+                            />
+                            <button onClick={onToggleSound} className={`text-sm font-bold w-16 text-center border-2 rounded-md py-1 transition-colors ${soundEnabled ? 'bg-cyan-500 text-black border-cyan-500' : 'text-gray-400 border-slate-600'}`}>
+                                {soundEnabled ? 'ON' : 'OFF'}
+                            </button>
+                        </div>
                     </div>
-                     {renderSlider('sound-volume', 'Sound Volume', soundVolume, onSetSoundVolume)}
 
-                    <div className="flex justify-between items-center pt-2">
-                        <span className="font-semibold text-lg">Music</span>
-                        <button onClick={onToggleMusic} className="text-lg font-bold text-cyan-400 w-16 text-center">
-                            {musicEnabled ? 'ON' : 'OFF'}
-                        </button>
+                    <div>
+                        <label htmlFor="music-volume" className="font-semibold text-lg mb-2 block">Music</label>
+                        <div className="flex items-center gap-4">
+                             <input
+                                id="music-volume"
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.05"
+                                value={musicVolume}
+                                onChange={(e) => onSetMusicVolume(Number(e.target.value))}
+                                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer range-thumb flex-grow"
+                            />
+                            <button onClick={onToggleMusic} className={`text-sm font-bold w-16 text-center border-2 rounded-md py-1 transition-colors ${musicEnabled ? 'bg-cyan-500 text-black border-cyan-500' : 'text-gray-400 border-slate-600'}`}>
+                                {musicEnabled ? 'ON' : 'OFF'}
+                            </button>
+                        </div>
                     </div>
-                    {renderSlider('music-volume', 'Music Volume', musicVolume, onSetMusicVolume)}
                     
                     <div className="pt-2">
                        {renderSelect('music-select', 'Select Music', selectedTrack, (val) => onSelectTrack(val), MUSIC_TRACKS.map(track => ({label: track.name, value: track.src})))}
@@ -142,30 +147,22 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     )}
                 </div>
 
-                {context === 'game' ? (
-                    <>
-                        <div className="mt-8 grid grid-cols-2 gap-4">
-                            <button
-                                onClick={onGoToShop}
-                                className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold text-base hover:bg-purple-500 transition-colors"
-                            >
-                                Shop
-                            </button>
-                            <button
-                                onClick={onGoToInventory}
-                                className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-base hover:bg-indigo-500 transition-colors"
-                            >
-                                Inventory
-                            </button>
-                        </div>
+                {context === 'game' && (
+                    <div className="mt-8 grid grid-cols-2 gap-4">
                         <button
-                            onClick={onResign}
-                            className="w-full mt-4 bg-red-600 text-white py-3 rounded-lg font-bold text-base hover:bg-red-500 transition-colors"
+                            onClick={onGoToShop}
+                            className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold text-base hover:bg-purple-500 transition-colors"
                         >
-                            Resign Game
+                            Shop
                         </button>
-                    </>
-                ) : null}
+                        <button
+                            onClick={onGoToInventory}
+                            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-base hover:bg-indigo-500 transition-colors"
+                        >
+                            Inventory
+                        </button>
+                    </div>
+                )}
 
                 <button
                     onClick={onClose}

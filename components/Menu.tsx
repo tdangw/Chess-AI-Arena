@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { CoinIcon, PencilIcon, ShopIcon, InventoryIcon, SettingsIcon, GlobeIcon } from './icons';
-import { Skin, PieceType as PieceEnum } from '../types';
+import { Skin, } from '../types';
 import { SHOP_ITEMS } from '../constants';
 import { audioService } from '../services/audioService';
 
@@ -94,7 +94,7 @@ const Menu: React.FC<MenuProps> = ({
                 <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
                     Chess AI Arena
                 </h1>
-                <p className="text-gray-400 mt-1 text-xs">Five in a row. Infinite possibilities.</p>
+                <p className="text-gray-400 mt-1 text-xs">A battle of wits across the river.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">

@@ -9,7 +9,7 @@ import EndGameModal from './components/EndGameModal';
 import SettingsModal from './components/SettingsModal';
 import ConfirmModal from './components/ConfirmModal';
 import PieceComponent from './components/Piece';
-import { INITIAL_PIECES, PIECE_UNICODE, TURN_DURATION_SECONDS, AVATAR_ITEMS, EMOJI_ITEMS, DEFAULT_GAME_TIME_SECONDS, AI_OPPONENTS, MUSIC_TRACKS } from './constants';
+import { INITIAL_PIECES, PIECE_UNICODE, TURN_DURATION_SECONDS, AVATAR_ITEMS, DEFAULT_GAME_TIME_SECONDS, AI_OPPONENTS, MUSIC_TRACKS } from './constants';
 import { getValidMoves, isCheckmate, isCheck } from './services/gameLogic';
 import { getLocalAIMove } from './services/localAi';
 import { audioService } from './services/audioService';
@@ -267,6 +267,7 @@ const App: React.FC = () => {
             endGame(gameWinner);
         } else if (isCheck(currentPieces, nextPlayer)) {
             setGameState('check');
+            audioService.playCheckSound();
             setShowCheckWarning(true);
             setTimeout(() => setShowCheckWarning(false), 2000);
         } else {
@@ -318,7 +319,7 @@ const App: React.FC = () => {
                     makeMove(aiResult.move.from, aiResult.move.to);
                     if (aiResult.emoji) {
                         setTimeout(() => {
-                            setAnimatingEmoji({ emoji: aiResult.emoji, from: 'ai' });
+                            setAnimatingEmoji({ emoji: aiResult.emoji!, from: 'ai' });
                             setTimeout(() => setAnimatingEmoji(null), 3500);
                         }, 700);
                     }
@@ -705,10 +706,6 @@ const App: React.FC = () => {
                     onClose={() => {
                         audioService.playClickSound();
                         setIsSettingsOpen(false);
-                    }}
-                    onResign={() => {
-                        audioService.playClickSound();
-                        setShowResignConfirm(true);
                     }}
                     onGoToShop={() => {
                         setIsSettingsOpen(false);
