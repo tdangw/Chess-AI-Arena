@@ -143,6 +143,28 @@ const FirstMoveAnimation: React.FC<FirstMoveAnimationProps> = ({ onAnimationEnd,
     );
 };
 
+// --- Entry Screen Component ---
+interface EntryScreenProps {
+  onEnter: () => void;
+}
+
+const EntryScreen: React.FC<EntryScreenProps> = ({ onEnter }) => {
+  return (
+    <div className="absolute inset-0 bg-[#0F172A] flex flex-col items-center justify-center z-[100] font-sans">
+        <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 text-center">
+            Chess AI Arena
+        </h1>
+        <p className="text-gray-400 mt-2 text-lg text-center">A battle of wits across the river.</p>
+        <button 
+            onClick={onEnter} 
+            className="mt-12 text-2xl font-bold bg-cyan-500 text-black py-4 px-10 rounded-lg transition-transform hover:scale-105 animate-pulse shadow-lg shadow-cyan-500/30"
+        >
+            CHƠI NGAY!
+        </button>
+    </div>
+  );
+};
+
 
 const App: React.FC = () => {
     const [initialState] = useState(getInitialState);
@@ -178,6 +200,7 @@ const App: React.FC = () => {
 
 
     // Modals, Popups & Timers
+    const [showEntryScreen, setShowEntryScreen] = useState(true);
     const [showEndGameModal, setShowEndGameModal] = useState(false);
     const [showEndGameAnimation, setShowEndGameAnimation] = useState<'win' | 'lose' | null>(null);
     const [showFirstMoveAnimation, setShowFirstMoveAnimation] = useState(false);
@@ -520,6 +543,11 @@ const App: React.FC = () => {
         setShowFirstMoveAnimation(false);
     };
 
+    const handleEnterApp = () => {
+        audioService.unlockAudio();
+        setShowEntryScreen(false);
+    };
+
     const playerAvatarUrl = AVATAR_ITEMS.find(a => a.id === equippedAvatar)?.url || 'https://i.pravatar.cc/150?u=player1';
 
     const { capturedRedPieces, capturedBlackPieces } = useMemo(() => {
@@ -769,44 +797,47 @@ const App: React.FC = () => {
 
     return (
         <div className="w-full min-h-screen bg-[#0F172A]">
-            {renderView()}
-            {isSettingsOpen && (
-                <SettingsModal
-                    context={view === 'game' ? 'game' : 'menu'}
-                    soundEnabled={soundEnabled}
-                    onToggleSound={() => {
-                        audioService.playClickSound();
-                        setSoundEnabled(p => !p);
-                    }}
-                    musicEnabled={musicEnabled}
-                    onToggleMusic={() => {
-                        audioService.playClickSound();
-                        setMusicEnabled(p => !p);
-                    }}
-                    selectedTrack={musicTrack}
-                    onSelectTrack={setMusicTrack}
-                    soundVolume={soundVolume}
-                    onSetSoundVolume={setSoundVolume}
-                    musicVolume={musicVolume}
-                    onSetMusicVolume={setMusicVolume}
-                    gameDuration={gameDuration}
-                    onSetGameDuration={setGameDuration}
-                    turnDuration={turnDuration}
-                    onSetTurnDuration={setTurnDuration}
-                    onClose={() => {
-                        audioService.playClickSound();
-                        setIsSettingsOpen(false);
-                    }}
-                    onGoToShop={() => {
-                        handleNavigate('shop');
-                        setIsSettingsOpen(false);
-                    }}
-                    onGoToInventory={() => {
-                        handleNavigate('inventory');
-                        setIsSettingsOpen(false);
-                    }}
-                />
-            )}
+            {showEntryScreen && <EntryScreen onEnter={handleEnterApp} />}
+            <div className={showEntryScreen ? 'opacity-0 pointer-events-none' : 'opacity-100 transition-opacity duration-700'}>
+                {renderView()}
+                {isSettingsOpen && (
+                    <SettingsModal
+                        context={view === 'game' ? 'game' : 'menu'}
+                        soundEnabled={soundEnabled}
+                        onToggleSound={() => {
+                            audioService.playClickSound();
+                            setSoundEnabled(p => !p);
+                        }}
+                        musicEnabled={musicEnabled}
+                        onToggleMusic={() => {
+                            audioService.playClickSound();
+                            setMusicEnabled(p => !p);
+                        }}
+                        selectedTrack={musicTrack}
+                        onSelectTrack={setMusicTrack}
+                        soundVolume={soundVolume}
+                        onSetSoundVolume={setSoundVolume}
+                        musicVolume={musicVolume}
+                        onSetMusicVolume={setMusicVolume}
+                        gameDuration={gameDuration}
+                        onSetGameDuration={setGameDuration}
+                        turnDuration={turnDuration}
+                        onSetTurnDuration={setTurnDuration}
+                        onClose={() => {
+                            audioService.playClickSound();
+                            setIsSettingsOpen(false);
+                        }}
+                        onGoToShop={() => {
+                            handleNavigate('shop');
+                            setIsSettingsOpen(false);
+                        }}
+                        onGoToInventory={() => {
+                            handleNavigate('inventory');
+                            setIsSettingsOpen(false);
+                        }}
+                    />
+                )}
+            </div>
         </div>
     );
 };

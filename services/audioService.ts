@@ -39,13 +39,7 @@ class AudioService {
   private wasMusicPlayingBeforeHidden = false;
 
   constructor() {
-    const init = () => {
-      if (this.hasInteracted) return;
-      this.hasInteracted = true;
-      this.initializeAudio();
-    };
-    document.body.addEventListener('click', init, { once: true });
-    document.body.addEventListener('touchend', init, { once: true });
+    this.createAndLoadAudioSources();
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
@@ -62,7 +56,7 @@ class AudioService {
     }
   };
 
-  private initializeAudio() {
+  private createAndLoadAudioSources() {
     if (typeof Audio === 'undefined') {
       console.warn('Audio API not supported.');
       return;
@@ -101,10 +95,13 @@ class AudioService {
         });
       }
     });
+  }
 
-    if (this.musicEnabled) {
-      this.playMusic();
-    }
+  public unlockAudio() {
+    if (this.hasInteracted) return;
+    this.hasInteracted = true;
+    console.log('Audio unlocked by user interaction.');
+    this.playMusic();
   }
 
   private playSound(sound: HTMLAudioElement | null) {
@@ -177,6 +174,9 @@ class AudioService {
       this.sources.music.src = trackSrc;
       this.sources.music.load();
       this.playMusic();
+    } else if (this.sources.music) {
+      // If audio isn't unlocked yet, just change the source for later.
+      this.sources.music.src = trackSrc;
     }
   }
 
